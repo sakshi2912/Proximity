@@ -12,9 +12,22 @@ elif platform == "win32":
 else:
     print('Unsupported OS')
     os.exit(1)
-    
+
 PORT= 5050
 
+def encodefunc1(val):
+    print(val)
+def encodefunc2(val):
+    print(val)
+
+def getpasskey(str1):
+    if str1[0:9] == '192.168.':
+        encodefunc1(str1[9:].zfill(7))
+    else:
+        encodefunc2(str1.zfill(15))
+
+
+getpasskey(SERVER)
 ADDR =(SERVER,PORT)
 FORMAT='utf-8'
 #header of 64 bytes : tells us the length of the message coming
