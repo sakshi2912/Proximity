@@ -2,7 +2,7 @@ import socket
 import threading
 
 PORT= 5050
-SERVER = '192.168.56.1'
+SERVER = '192.168.0.105'
 ADDR =(SERVER,PORT)
 FORMAT='utf-8'
 HEADER=64

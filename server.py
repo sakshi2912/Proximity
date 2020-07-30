@@ -1,10 +1,20 @@
 import socket
 import threading
+import os
+from sys import platform
 
+SERVER = ''
+
+if platform == "linux" or platform == "linux2":
+    SERVER = str(os.system("ifconfig | grep 192 | awk -F ' ' '{print $2}'"))
+elif platform == "win32":
+    SERVER = socket.gethostbyname(socket.gethostname())
+else:
+    print('Unsupported OS')
+    os.exit(1)
+    
 PORT= 5050
-#fetch host IP dynamically
-SERVER = socket.gethostbyname(socket.gethostname())
-#one tuple to bind 
+
 ADDR =(SERVER,PORT)
 FORMAT='utf-8'
 #header of 64 bytes : tells us the length of the message coming
