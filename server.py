@@ -57,8 +57,8 @@ def start_sockets():
     print(f"[LISTENING ON : {SERVER}]")
     while(1):
         conn, addr = server.accept()
-        thread1 = threading.Thread(target=handle_client, args=(conn, addr))
-        thread1.start()
+        client_thread = threading.Thread(target=handle_client, args=(conn, addr))
+        client_thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.activeCount()-1}")
 
 print('Starting server')
