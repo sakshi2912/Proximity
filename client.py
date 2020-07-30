@@ -1,7 +1,8 @@
 import socket
 
 c = socket.socket()
-c.connect(('localhost',9999))
+# print(socket.gethostname())
+c.connect(('192.168.0.105',9999))
 
 name= input('Enter your name')
 c.send(bytes(name,'utf-8'))
