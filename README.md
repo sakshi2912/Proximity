@@ -1,3 +1,3 @@
 # TRAT
 
-A lan texing app for the terminal
+A terminal based offline chatroom. 
