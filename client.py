@@ -73,12 +73,15 @@ def rec_msg():
                 message = client.recv(message_length).decode(FORMAT)
                 if message == DISCONNECT_MESSAGE:
                     connected = False
-                print(f"\t\t\t\t\t\t{message}")
+                print(f"\t\t\t\t\t\t\t{message}")
         print('The person has left the chat')
     except ConnectionResetError:
         print('The connection is closed , you must restart the terminal')
     except ConnectionAbortedError:
         print('The connection is closed , you must restart the terminal')
+    except OSError:
+        print('There was some problem connecting you to the chat, please try again in some time')
+    client.close()
     
 
 send_thread = threading.Thread(target=send_message)

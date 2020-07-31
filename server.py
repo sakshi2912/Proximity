@@ -62,13 +62,16 @@ def handle_client(conn, addr):
                 message = conn.recv(message_length).decode(FORMAT)
                 if message == DISCONNECT_MESSAGE:
                     connected = False
-                print(f"\t\t\t\t\t\t{message}")
+                print(f"\t\t\t\t\t\t\t{message}")
         print('The person has left the chat')
         conn.close()
     except ConnectionResetError:
         print('The connection is closed , you must restart the terminal')
     except ConnectionAbortedError:
         print('The connection is closed , you must restart the terminal')
+    except OSError:
+        print('There was some problem connecting you to the chat, please try again in some time')
+        
     
 
 def send(conn,addr):
@@ -104,5 +107,5 @@ def start_sockets():
 
 print('Starting server')
 getpasskey(SERVER)
-
+username = input('Enter your username')
 start_sockets()
