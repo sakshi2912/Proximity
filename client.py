@@ -9,8 +9,19 @@ import threading
 import os
 import time
 import signal
+<<<<<<< HEAD
 from sys import platform
 os.system("clear")
+=======
+
+if platform == "linux" or platform == "linux2":
+    os.system('clear')
+elif platform == "win32":
+    os.system('cls')
+else:
+    print('Unsupported OS')
+    os.exit(1)
+>>>>>>> 9c3ec72326bb35808e93a6f2cebb59d4a35ac21c
 
 colorama.init()
 cprint(figlet_format('PROXIMITY', font="standard"), "cyan")

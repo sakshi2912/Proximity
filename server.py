@@ -9,6 +9,14 @@ from pyfiglet import figlet_format
 from termcolor import cprint
 from subprocess import check_output
 
+if platform == "linux" or platform == "linux2":
+    os.system('clear')
+elif platform == "win32":
+    os.system('cls')
+else:
+    print('Unsupported OS')
+    os.exit(1)
+
 colorama.init()
 cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
 print("New chat room created!!")
