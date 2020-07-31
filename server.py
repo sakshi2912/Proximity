@@ -19,7 +19,6 @@ else:
 
 colorama.init()
 cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
-print("New chat room created!!")
 
 if platform == "linux" or platform == "linux2":
     if (os.path.exists('ip.txt')):
@@ -115,5 +114,5 @@ def start_sockets():
 
 print('Starting server')
 getpasskey(SERVER)
-username = input('Enter your username')
+username = input('Enter your username : ')
 start_sockets()

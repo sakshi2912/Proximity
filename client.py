@@ -34,25 +34,37 @@ def decode_key(valu):
     try:
         decoded_data = base64.b64decode(valu)
         dec_ip = decoded_data.decode('utf-8')
+        print(dec_ip)
         if len(dec_ip) == 8:
             dec_ip = '192.168' + dec_ip.lstrip('0')
         elif len(dec_ip) == 15:
             dec_ip = dec_ip.lstrip('0')
-    except:
-        print(" There is no such room available\n ")
+        elif len(dec_ip)==0: 
+            print(" Please enter a passkey \n ")
+            passkey = input(" Re-enter your accesskey : ")
+            dec_ip = decode_key(passkey)
+        else:
+            print(" Please enter the correct passkey \n ")
+            passkey = input(" Re-enter your accesskey : ")
+            dec_ip = decode_key(passkey)
+            
+    except (ConnectionRefusedError,UnicodeDecodeError,UnboundLocalError,base64.binascii.Error):
+        print(" Please enter the correct passkey \n ")
         passkey = input(" Re-enter your accesskey : ")
-        dec_ip = decode_key(passkey)
-    except ConnectionRefusedError:
-        print(" Please enter a passkey \n ")
-        passkey = input(" Re-enter your accesskey : ")
-        dec_ip = decode_key(passkey)
+        dec_ip = decode_key(passkey)    
 
     finally:
         return dec_ip
 
 SERVER = decode_key(passkey)
 ADDR = (SERVER, PORT)
-client.connect(ADDR)
+
+try:
+    client.connect(ADDR)
+except ConnectionRefusedError:
+        print("There is no such room available in your network \n ")
+        passkey = input(" Re-enter your accesskey : ")
+        dec_ip = decode_key(passkey)
 
 #result = client.connect_ex(ADDR)
 
@@ -87,11 +99,9 @@ def rec_msg():
                     connected = False
                 print(f"\t\t\t\t\t\t\t{message}")
         print('The person has left the chat')
-    except ConnectionResetError:
+    except (ConnectionResetError,ConnectionAbortedError):
         print('The connection is closed , you must restart the terminal')
-    except ConnectionAbortedError:
-        print('The connection is closed , you must restart the terminal')
-    except OSError:
+    except (OSError,ConnectionRefusedError):
         print('There was some problem connecting you to the chat, please try again in some time')
     client.close()
     
