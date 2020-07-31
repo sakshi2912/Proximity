@@ -8,9 +8,11 @@ import colorama
 from pyfiglet import figlet_format
 from termcolor import cprint
 
-colorama.init()
-cprint(figlet_format('                          PROXIMITY', font="standard"), "cyan")  
+os.system("clear")
 
+colorama.init()
+cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
+print("New chat room created!!")
 
 SERVER = ''
 
@@ -26,7 +28,7 @@ PORT = 5050
 
 def encodefunc(val):
     encoded_data = base64.b64encode(bytes(val, 'utf-8'))
-    print(f"\n\n\t\t\t\t--------      Your access code : ( {encoded_data.decode('utf-8')} )      --------")
+    print(f"\n\n-------- Your Chat-Room's accesskey : ( {encoded_data.decode('utf-8')} ) --------")
 
 def getpasskey(str1):
     if str1[0:8] == '192.168.':

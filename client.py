@@ -6,14 +6,14 @@ import socket
 import sys
 from termcolor import cprint
 import threading
+import os
 
-
+os.system("clear")
 
 colorama.init()
-cprint(figlet_format('                          PROXIMITY', font="standard"), "cyan") 
+cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
 
-
-passkey = input("\n\n\n Enter your accesskey: ")
+passkey = input("\n\n\n Enter the Chat-Room's accesskey: ")
 #username = input("Enter a username : ")
 PORT = 5050
 FORMAT = 'utf-8'
@@ -34,10 +34,10 @@ def decode_key(valu):
         print(" There is no such room available\n ")
         passkey = input(" Re-enter your accesskey : ")
         dec_ip = decode_key(passkey)
-    
+
     finally:
-         return dec_ip
-     
+        return dec_ip
+
 SERVER = decode_key(passkey)
 ADDR = (SERVER, PORT)
 client.connect(ADDR)
@@ -52,7 +52,7 @@ def send(message_val):
     client.send(message)
     print(client.recv(1024).decode(FORMAT))
 
-#client.send(bytes(username,'utf-8'))
+# client.send(bytes(username,'utf-8'))
 send("Hello")
 send("Peter Kavinsky")
 send("Jacob Elordi")
