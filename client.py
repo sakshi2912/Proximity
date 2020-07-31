@@ -50,13 +50,27 @@ def send(message_val):
     send_len += b' '*(HEADER-len(send_len))
     client.send(send_len)
     client.send(message)
-    print(client.recv(1024).decode(FORMAT))
 
-# client.send(bytes(username,'utf-8'))
-send("Hello")
-send("Peter Kavinsky")
-send("Jacob Elordi")
-send("aaa")
-send("ooo")
-# Disconnect
-send("!DISCONNECT")
+def send_message():
+    while(client):
+        send(input())
+        
+def rec_msg():
+    connected = True
+    while(connected):
+        # message=conn.recv(1024)
+        message_length = client.recv(HEADER).decode(FORMAT)
+        if message_length:
+            message_length = int(message_length)
+            message = client.recv(message_length).decode(FORMAT)
+            if message == DISCONNECT_MESSAGE:
+                connected = False
+            print(f"\t\t\t\t\t\t{message}")
+    print('The person has left the chat')
+    return
+            
+        
+send_thread = threading.Thread(target=send_message)
+rec_thread = threading.Thread(target=rec_msg)
+send_thread.start()
+rec_thread.start()

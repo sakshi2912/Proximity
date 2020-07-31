@@ -55,10 +55,25 @@ def handle_client(conn, addr):
             message = conn.recv(message_length).decode(FORMAT)
             if message == DISCONNECT_MESSAGE:
                 connected = False
-            print(f"[{addr}] {message}")
-            conn.send('Received'.encode(FORMAT))
-
+            print(f"\t\t\t\t\t\t{message}")
+    print('The person has left the chat')
     conn.close()
+    return
+
+def send(conn,addr):
+    message_val = input()
+    message = message_val.encode(FORMAT)
+    message_length = len(message)
+    send_len = str(message_length).encode(FORMAT)
+    # padd it to header
+    send_len += b' '*(HEADER-len(send_len))
+    conn.send(send_len)
+    conn.send(message)
+   
+
+def send_message(conn,addr):
+    while(conn):
+        send(conn,addr)
 
 def start_sockets():
     server.listen()
@@ -66,7 +81,9 @@ def start_sockets():
     while(1):
         conn, addr = server.accept()
         client_thread = threading.Thread(target=handle_client, args=(conn, addr))
+        send_thread = threading.Thread(target=send_message,args=(conn,addr))
         client_thread.start()
+        send_thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.activeCount()-1}")
 
 print('Starting server')
