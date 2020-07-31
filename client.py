@@ -9,7 +9,7 @@ import threading
 import os
 import time
 import signal
-
+from sys import platform
 os.system("clear")
 
 colorama.init()
@@ -42,8 +42,9 @@ def decode_key(valu):
 
 SERVER = decode_key(passkey)
 ADDR = (SERVER, PORT)
-#client.connect(ADDR)
-result = client.connect_ex(ADDR)
+client.connect(ADDR)
+
+#result = client.connect_ex(ADDR)
 
 def send(message_val):
     message = message_val.encode(FORMAT)
@@ -55,7 +56,7 @@ def send(message_val):
     client.send(message)
 
 def send_message():
-    while(not result):
+    while(1):
         try:
             send(input())
         except:
