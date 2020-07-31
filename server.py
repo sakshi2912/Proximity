@@ -23,7 +23,7 @@ elif platform == "win32":
     SERVER = socket.gethostbyname(socket.gethostname())
 else:
     print('Unsupported OS')
-    os._exit(1)
+    exit(1)
 
 colorama.init()
 cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
@@ -55,7 +55,7 @@ try:
     server.bind(ADDR)
 except:
     print('A room already exists in this server')
-    os._exit(1)
+    exit(1)
 
 
 def handle_client(conn, addr):
@@ -73,9 +73,9 @@ def handle_client(conn, addr):
         print('The person has left the chat')
         conn.close()
     except ConnectionResetError:
-        print('The connection is closed , you must restart the terminal')
+        print('The connection is closed , you must restart the terminal 1')
     except ConnectionAbortedError:
-        print('The connection is closed , you must restart the terminal')
+        print('The connection is closed , you must restart the terminal 2')
     except OSError:
         print('There was some problem connecting you to the chat, please try again in some time')
 
@@ -95,14 +95,14 @@ def send_message(conn, addr):
             print('Cannot send message')
             conn.close()
     conn.close()
+    exit(0)
 
 
 def start_sockets():
     server.listen()
     while(1):
         conn, addr = server.accept()
-        client_thread = threading.Thread(
-            target=handle_client, args=(conn, addr))
+        client_thread = threading.Thread(target=handle_client, args=(conn, addr))
         send_thread = threading.Thread(target=send_message, args=(conn, addr))
         client_thread.start()
         send_thread.start()

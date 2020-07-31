@@ -16,7 +16,7 @@ elif platform == "win32":
     os.system('cls')
 else:
     print('Unsupported OS')
-    os._exit(1)
+    exit(1)
 
 colorama.init()
 cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
@@ -82,15 +82,16 @@ def send(u_message):
 
 
 def send_message():
-    while(1):
+    while(client.fileno()):
         try:
             send(input())
 
         except:
             print('Cannot send message')
             client.close()
+            exit(0)
     client.close()
-
+    exit(0)
 
 def rec_msg():
     try:
@@ -103,7 +104,8 @@ def rec_msg():
                 if message[-(len(DISCONNECT_MESSAGE)):] == DISCONNECT_MESSAGE:
                     connected = False
                 print(f"\t\t\t\t\t\t{message}")
-        print('The person has left the chat')
+        print('The SERVER disconnected')
+        exit(0)
     except (ConnectionResetError, ConnectionAbortedError):
         print('The connection is closed , you must restart the terminal')
     except (OSError, ConnectionRefusedError):
