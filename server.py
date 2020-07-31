@@ -14,8 +14,15 @@ cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
 print("New chat room created!!")
 
 if platform == "linux" or platform == "linux2":
-    SERVER = check_output(['hostname', '--all-ip-addresses']).decode('utf-8').strip(' \n')
-    #SERVER = str(os.system("ifconfig | grep 192 | awk -F ' ' '{print $2}'"))
+    if (os.path.exists('ip.txt')):
+        os.remove('ip.txt')
+    os.system("ifconfig | grep 192 | awk -F ' ' '{print $2}' > ip.txt")
+    f = open('ip.txt', 'r')
+    line = f.readline()
+    os.remove('ip.txt')
+    SERVER = line.strip()
+    print(SERVER)
+
 elif platform == "win32":
     SERVER = socket.gethostbyname(socket.gethostname())
 else:
@@ -33,7 +40,6 @@ def getpasskey(str1):
         encodefunc(str1[8:].zfill(7))
     else:
         encodefunc(str1.zfill(15))
-
 
 
 ADDR = (SERVER, PORT)
