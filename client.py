@@ -10,7 +10,13 @@ import os
 import time
 import signal
 
-os.system("clear")
+if platform == "linux" or platform == "linux2":
+    os.system('clear')
+elif platform == "win32":
+    os.system('cls')
+else:
+    print('Unsupported OS')
+    os.exit(1)
 
 colorama.init()
 cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
