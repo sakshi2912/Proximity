@@ -15,7 +15,7 @@ elif platform == "win32":
     os.system('cls')
 else:
     print('Unsupported OS')
-    os.exit(1)
+    os._exit(1)
 
 colorama.init()
 cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
@@ -35,7 +35,7 @@ elif platform == "win32":
     SERVER = socket.gethostbyname(socket.gethostname())
 else:
     print('Unsupported OS')
-    os.exit(1)
+    os._exit(1)
 
 PORT = 5050
 
@@ -44,8 +44,8 @@ def encodefunc(val):
     print(f"\n\n-------- Your Chat-Room's accesskey : ( {encoded_data.decode('utf-8')} ) --------")
 
 def getpasskey(str1):
-    if str1[0:8] == '192.168.':
-        encodefunc(str1[8:].zfill(7))
+    if str1[0:7] == '192.168':
+        encodefunc(str1[7:].zfill(8))
     else:
         encodefunc(str1.zfill(15))
 
