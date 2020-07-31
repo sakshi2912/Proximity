@@ -7,6 +7,8 @@ import sys
 from termcolor import cprint
 import threading
 import os
+import time
+import signal
 
 os.system("clear")
 
@@ -40,7 +42,8 @@ def decode_key(valu):
 
 SERVER = decode_key(passkey)
 ADDR = (SERVER, PORT)
-client.connect(ADDR)
+#client.connect(ADDR)
+result = client.connect_ex(ADDR)
 
 def send(message_val):
     message = message_val.encode(FORMAT)
@@ -52,24 +55,32 @@ def send(message_val):
     client.send(message)
 
 def send_message():
-    while(client):
-        send(input())
+    while(not result):
+        try:
+            send(input())
+        except:
+            print('Cannot send message')
+            client.close()
         
 def rec_msg():
-    connected = True
-    while(connected):
-        # message=conn.recv(1024)
-        message_length = client.recv(HEADER).decode(FORMAT)
-        if message_length:
-            message_length = int(message_length)
-            message = client.recv(message_length).decode(FORMAT)
-            if message == DISCONNECT_MESSAGE:
-                connected = False
-            print(f"\t\t\t\t\t\t{message}")
-    print('The person has left the chat')
-    return
-            
-        
+    try:
+        connected = True
+        while(connected):
+            # message=conn.recv(1024)
+            message_length = client.recv(HEADER).decode(FORMAT)
+            if message_length:
+                message_length = int(message_length)
+                message = client.recv(message_length).decode(FORMAT)
+                if message == DISCONNECT_MESSAGE:
+                    connected = False
+                print(f"\t\t\t\t\t\t{message}")
+        print('The person has left the chat')
+    except ConnectionResetError:
+        print('The connection is closed , you must restart the terminal')
+    except ConnectionAbortedError:
+        print('The connection is closed , you must restart the terminal')
+    
+
 send_thread = threading.Thread(target=send_message)
 rec_thread = threading.Thread(target=rec_msg)
 send_thread.start()

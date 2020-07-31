@@ -51,20 +51,25 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
 def handle_client(conn, addr):
-    print(f"[New connection from client] {addr}")
-    connected = True
-    while(connected):
-        # message=conn.recv(1024)
-        message_length = conn.recv(HEADER).decode(FORMAT)
-        if message_length:
-            message_length = int(message_length)
-            message = conn.recv(message_length).decode(FORMAT)
-            if message == DISCONNECT_MESSAGE:
-                connected = False
-            print(f"\t\t\t\t\t\t{message}")
-    print('The person has left the chat')
-    conn.close()
-    return
+    try:
+        print(f"[New connection from client] {addr}")
+        connected = True
+        while(connected):
+            # message=conn.recv(1024)
+            message_length = conn.recv(HEADER).decode(FORMAT)
+            if message_length:
+                message_length = int(message_length)
+                message = conn.recv(message_length).decode(FORMAT)
+                if message == DISCONNECT_MESSAGE:
+                    connected = False
+                print(f"\t\t\t\t\t\t{message}")
+        print('The person has left the chat')
+        conn.close()
+    except ConnectionResetError:
+        print('The connection is closed , you must restart the terminal')
+    except ConnectionAbortedError:
+        print('The connection is closed , you must restart the terminal')
+    
 
 def send(conn,addr):
     message_val = input()
@@ -78,8 +83,13 @@ def send(conn,addr):
    
 
 def send_message(conn,addr):
-    while(conn):
-        send(conn,addr)
+    while(1):
+        try:
+            send(conn,addr)
+        except:
+            print('Cannot send message')
+            conn.close()
+    conn.close()
 
 def start_sockets():
     server.listen()
