@@ -43,6 +43,10 @@ def decode_key(valu):
         print(" There is no such room available\n ")
         passkey = input(" Re-enter your accesskey : ")
         dec_ip = decode_key(passkey)
+    except ConnectionRefusedError:
+        print(" Please enter a passkey \n ")
+        passkey = input(" Re-enter your accesskey : ")
+        dec_ip = decode_key(passkey)
 
     finally:
         return dec_ip
