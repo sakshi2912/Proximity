@@ -3,13 +3,12 @@ import colorama
 from colorama import init
 from pyfiglet import figlet_format
 import socket
-import sys
+from sys import platform
 from termcolor import cprint
 import threading
 import os
 import time
 import signal
-import platform
 
 if platform == "linux" or platform == "linux2":
     os.system('clear')
@@ -17,7 +16,7 @@ elif platform == "win32":
     os.system('cls')
 else:
     print('Unsupported OS')
-    os.exit(1)
+    os._exit(1)
 
 colorama.init()
 cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
@@ -35,8 +34,8 @@ def decode_key(valu):
     try:
         decoded_data = base64.b64decode(valu)
         dec_ip = decoded_data.decode('utf-8')
-        if len(dec_ip) == 7:
-            dec_ip = '192.168.' + dec_ip.lstrip('0')
+        if len(dec_ip) == 8:
+            dec_ip = '192.168' + dec_ip.lstrip('0')
         elif len(dec_ip) == 15:
             dec_ip = dec_ip.lstrip('0')
     except:
