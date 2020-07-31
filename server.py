@@ -3,6 +3,14 @@ import threading
 import os
 from sys import platform
 import base64
+from colorama import init
+import colorama
+from pyfiglet import figlet_format
+from termcolor import cprint
+
+colorama.init()
+cprint(figlet_format('                          T R A T', font="standard"), "cyan") 
+
 
 SERVER = ''
 

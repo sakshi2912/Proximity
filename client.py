@@ -1,8 +1,20 @@
-import socket
-import threading
 import base64
+import colorama
+from colorama import init
+from pyfiglet import figlet_format
+import socket
+import sys
+from termcolor import cprint
+import threading
 
-passkey = input("Enter your accesskey: ")
+from terminal_width import getTerminalSize
+
+colorama.init()
+sizex,sizey=getTerminalSize() 
+cprint(figlet_format('                          T R A T', font="standard",width=sizex), "cyan") 
+
+
+passkey = input("\n\n\n Enter your accesskey: ")
 PORT = 5050
 FORMAT = 'utf-8'
 HEADER = 64
@@ -19,7 +31,7 @@ def decode_key(valu):
         elif len(dec_ip) == 15:
             dec_ip = dec_ip.lstrip('0')
     except:
-        print(" Incorrect access key ")
+        print(" There is no such room available\n ")
         passkey = input(" Re-enter your accesskey : ")
         dec_ip = decode_key(passkey)
     
