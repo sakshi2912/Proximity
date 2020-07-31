@@ -40,7 +40,7 @@ PORT = 5050
 
 def encodefunc(val):
     encoded_data = base64.b64encode(bytes(val, 'utf-8'))
-    print(f"\n\n-------- Your Chat-Room's accesskey : ( {encoded_data.decode('utf-8')} ) --------")
+    print(f"\n\n-------- {username}'s Chat-Room accesskey : ( {encoded_data.decode('utf-8')} ) --------")
 
 def getpasskey(str1):
     if str1[0:7] == '192.168':
@@ -59,7 +59,7 @@ server.bind(ADDR)
 
 def handle_client(conn, addr):
     try:
-        print(f"[New connection from client] {addr}")
+        print(f"\n[New connection from {addr[0]}]")
         connected = True
         while(connected):
             # message=conn.recv(1024)
@@ -69,7 +69,7 @@ def handle_client(conn, addr):
                 message = conn.recv(message_length).decode(FORMAT)
                 if message == DISCONNECT_MESSAGE:
                     connected = False
-                print(f"\t\t\t\t\t\t\t{message}")
+                print(f"\t\t\t\t\t\t{message}")
         print('The person has left the chat')
         conn.close()
     except ConnectionResetError:
@@ -82,7 +82,10 @@ def handle_client(conn, addr):
     
 
 def send(conn,addr):
-    message_val = input()
+    
+    
+    usr_input = input()
+    message_val = f"[{username}] {usr_input}"
     message = message_val.encode(FORMAT)
     message_length = len(message)
     send_len = str(message_length).encode(FORMAT)
@@ -103,16 +106,15 @@ def send_message(conn,addr):
 
 def start_sockets():
     server.listen()
-    print(f"[LISTENING ON : {SERVER}]")
     while(1):
         conn, addr = server.accept()
         client_thread = threading.Thread(target=handle_client, args=(conn, addr))
         send_thread = threading.Thread(target=send_message,args=(conn,addr))
         client_thread.start()
         send_thread.start()
-        print(f"[ACTIVE CONNECTIONS] {threading.activeCount()-1}")
+        print(f"\n[ACTIVE CONNECTIONS] {threading.activeCount()-1}")
 
-print('Starting server')
-getpasskey(SERVER)
+print('Starting server...\n')
 username = input('Enter your username : ')
+getpasskey(SERVER)
 start_sockets()

@@ -21,7 +21,7 @@ else:
 colorama.init()
 cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
 
-passkey = input("\n\n\n Enter the Chat-Room's accesskey: ")
+passkey = input("Enter the Chat-Room's accesskey: ")
 #username = input("Enter a username : ")
 PORT = 5050
 FORMAT = 'utf-8'
@@ -34,22 +34,22 @@ def decode_key(valu):
     try:
         decoded_data = base64.b64decode(valu)
         dec_ip = decoded_data.decode('utf-8')
-        print(dec_ip)
+        
         if len(dec_ip) == 8:
             dec_ip = '192.168' + dec_ip.lstrip('0')
         elif len(dec_ip) == 15:
             dec_ip = dec_ip.lstrip('0')
         elif len(dec_ip)==0: 
-            print(" Please enter a passkey \n ")
+            print("Please enter a passkey \n ")
             passkey = input(" Re-enter your accesskey : ")
             dec_ip = decode_key(passkey)
         else:
-            print(" Please enter the correct passkey \n ")
+            print("Please enter the correct passkey \n ")
             passkey = input(" Re-enter your accesskey : ")
             dec_ip = decode_key(passkey)
             
     except (ConnectionRefusedError,UnicodeDecodeError,UnboundLocalError,base64.binascii.Error):
-        print(" Please enter the correct passkey \n ")
+        print("Please enter the correct passkey \n ")
         passkey = input(" Re-enter your accesskey : ")
         dec_ip = decode_key(passkey)    
 
@@ -61,6 +61,7 @@ ADDR = (SERVER, PORT)
 
 try:
     client.connect(ADDR)
+    print(f'\n[CONNECTED TO {SERVER}]')
 except ConnectionRefusedError:
         print("There is no such room available in your network \n ")
         passkey = input(" Re-enter your accesskey : ")
@@ -68,7 +69,8 @@ except ConnectionRefusedError:
 
 #result = client.connect_ex(ADDR)
 
-def send(message_val):
+def send(u_message):
+    message_val = f"[{username}] {u_message}"
     message = message_val.encode(FORMAT)
     message_length = len(message)
     send_len = str(message_length).encode(FORMAT)
@@ -97,7 +99,7 @@ def rec_msg():
                 message = client.recv(message_length).decode(FORMAT)
                 if message == DISCONNECT_MESSAGE:
                     connected = False
-                print(f"\t\t\t\t\t\t\t{message}")
+                print(f"\t\t\t\t\t\t{message}")
         print('The person has left the chat')
     except (ConnectionResetError,ConnectionAbortedError):
         print('The connection is closed , you must restart the terminal')
@@ -105,7 +107,7 @@ def rec_msg():
         print('There was some problem connecting you to the chat, please try again in some time')
     client.close()
     
-
+username=input("\nEnter your username : ")
 send_thread = threading.Thread(target=send_message)
 rec_thread = threading.Thread(target=rec_msg)
 send_thread.start()
