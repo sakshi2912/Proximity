@@ -9,7 +9,7 @@ from pyfiglet import figlet_format
 from termcolor import cprint
 
 colorama.init()
-cprint(figlet_format('                          T R A T', font="standard"), "cyan") 
+cprint(figlet_format('                          PROXIMITY', font="standard"), "cyan")  
 
 
 SERVER = ''

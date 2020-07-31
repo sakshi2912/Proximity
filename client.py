@@ -7,14 +7,14 @@ import sys
 from termcolor import cprint
 import threading
 
-from terminal_width import getTerminalSize
+
 
 colorama.init()
-sizex,sizey=getTerminalSize() 
-cprint(figlet_format('                          T R A T', font="standard",width=sizex), "cyan") 
+cprint(figlet_format('                          PROXIMITY', font="standard"), "cyan") 
 
 
 passkey = input("\n\n\n Enter your accesskey: ")
+#username = input("Enter a username : ")
 PORT = 5050
 FORMAT = 'utf-8'
 HEADER = 64
@@ -52,6 +52,7 @@ def send(message_val):
     client.send(message)
     print(client.recv(1024).decode(FORMAT))
 
+#client.send(bytes(username,'utf-8'))
 send("Hello")
 send("Peter Kavinsky")
 send("Jacob Elordi")
