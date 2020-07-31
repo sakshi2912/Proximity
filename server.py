@@ -7,17 +7,15 @@ from colorama import init
 import colorama
 from pyfiglet import figlet_format
 from termcolor import cprint
-
-os.system("clear")
+from subprocess import check_output
 
 colorama.init()
 cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
 print("New chat room created!!")
 
-SERVER = ''
-
 if platform == "linux" or platform == "linux2":
-    SERVER = str(os.system("ifconfig | grep 192 | awk -F ' ' '{print $2}'"))
+    SERVER = check_output(['hostname', '--all-ip-addresses']).decode('utf-8').strip(' \n')
+    #SERVER = str(os.system("ifconfig | grep 192 | awk -F ' ' '{print $2}'"))
 elif platform == "win32":
     SERVER = socket.gethostbyname(socket.gethostname())
 else:
@@ -36,7 +34,7 @@ def getpasskey(str1):
     else:
         encodefunc(str1.zfill(15))
 
-getpasskey(SERVER)
+
 
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
@@ -72,4 +70,6 @@ def start_sockets():
         print(f"[ACTIVE CONNECTIONS] {threading.activeCount()-1}")
 
 print('Starting server')
+getpasskey(SERVER)
+
 start_sockets()
