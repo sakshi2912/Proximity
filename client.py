@@ -28,6 +28,8 @@ FORMAT = 'utf-8'
 HEADER = 64
 DISCONNECT_MESSAGE = "!DISCONNECT"
 # connect to the socket
+
+
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 def decode_key(valu):

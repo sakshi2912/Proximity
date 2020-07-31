@@ -54,8 +54,13 @@ FORMAT = 'utf-8'
 # header of 64 bytes : tells us the length of the message coming
 HEADER = 64
 DISCONNECT_MESSAGE = "!DISCONNECT"
+
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(ADDR)
+try:
+    server.bind(ADDR)
+except:
+    print('A room already exists in this server')
+    os._exit(1)
 
 def handle_client(conn, addr):
     try:
