@@ -7,6 +7,7 @@ from colorama import init
 import colorama
 from pyfiglet import figlet_format
 from termcolor import cprint
+import sys
 from subprocess import check_output
 
 if platform == "linux" or platform == "linux2":
@@ -72,12 +73,11 @@ def handle_client(conn, addr):
                 print(f"\t\t\t\t\t\t{message}")
         print('The person has left the chat')
         conn.close()
-    except ConnectionResetError:
-        print('The connection is closed , you must restart the terminal')
-    except ConnectionAbortedError:
+    except (ConnectionResetError,ConnectionAbortedError):
         print('The connection is closed , you must restart the terminal')
     except OSError:
         print('There was some problem connecting you to the chat, please try again in some time')
+        
 
 
 def send_message(conn, addr):
@@ -91,10 +91,14 @@ def send_message(conn, addr):
             send_len += b' '*(HEADER-len(send_len))
             conn.send(send_len)
             conn.send(message)
+            if usr_input == '!DISCONNECT':
+                break
         except:
             print('Cannot send message')
             conn.close()
-    conn.close()
+    #conn.shutdown(socket.SHUT_RDWR)
+    #conn.close()
+    os._exit(0)
 
 
 def start_sockets():
@@ -108,6 +112,7 @@ def start_sockets():
         send_thread.start()
         print(f"\n[ACTIVE CONNECTIONS] {threading.activeCount()-1}")
 
+    
 
 print('Starting server...\n')
 username = input('Enter your username : ')
