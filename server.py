@@ -91,13 +91,11 @@ def send_message(conn, addr):
             send_len += b' '*(HEADER-len(send_len))
             conn.send(send_len)
             conn.send(message)
-            if usr_input == '!DISCONNECT':
+            if usr_input == DISCONNECT_MESSAGE:
                 break
         except:
             print('Cannot send message')
             conn.close()
-    #conn.shutdown(socket.SHUT_RDWR)
-    #conn.close()
     os._exit(0)
 
 
