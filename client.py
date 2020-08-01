@@ -9,6 +9,7 @@ import threading
 import os
 import time
 import signal
+import sys
 
 if platform == "linux" or platform == "linux2":
     os.system('clear')
@@ -85,32 +86,35 @@ def send_message():
     while(client.fileno()):
         try:
             send(input())
-
         except:
             print('Cannot send message')
             client.close()
-            exit(0)
-    client.close()
-    exit(0)
+            break
+    sys.exit()
+
 
 def rec_msg():
     try:
-        connected = True
-        while(connected):
+        while(True):
             message_length = client.recv(HEADER).decode(FORMAT)
             if message_length:
                 message_length = int(message_length)
                 message = client.recv(message_length).decode(FORMAT)
                 if message[-(len(DISCONNECT_MESSAGE)):] == DISCONNECT_MESSAGE:
-                    connected = False
+                    client.close()
+                    break
                 print(f"\t\t\t\t\t\t{message}")
-        print('The SERVER disconnected')
-        exit(0)
+        print('The server has left the chat')
+        
     except (ConnectionResetError, ConnectionAbortedError):
         print('The connection is closed , you must restart the terminal')
+        sys.exit(0)
     except (OSError, ConnectionRefusedError):
         print('There was some problem connecting you to the chat, please try again in some time')
-    client.close()
+
+    
+    
+
 
 
 username = input("\nEnter your username : ")
