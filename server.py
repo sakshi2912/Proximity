@@ -9,6 +9,7 @@ from pyfiglet import figlet_format
 from termcolor import cprint
 import sys
 from subprocess import check_output
+import time
 
 if platform == "linux" or platform == "linux2":
     os.system('clear')
@@ -30,6 +31,10 @@ colorama.init()
 cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
 
 PORT = 5050
+
+
+def print_to_stdout(*a):
+    print(*a, file=sys.stdout)
 
 
 def encodefunc(val):
@@ -59,8 +64,19 @@ except:
     exit(1)
 
 
+def readinput():
+    global user_input
+    user_input = input()
+    return
+
+
+userinput = threading.Thread(target=readinput, args=())
+connection_cl = 0
+
+
 def handle_client(conn, addr):
     try:
+        global userinput
         uname = conn.recv(10).decode(FORMAT)
         #print(f"\n[New connection from {addr[0]}]")
         print(f"{uname} joined the chat")
@@ -71,9 +87,15 @@ def handle_client(conn, addr):
                 message_length = int(message_length)
                 message = conn.recv(message_length).decode(FORMAT)
                 if message == DISCONNECT_MESSAGE:
+                    print(f"\t\t\t\t\t\t{uname} > {message}")
+                    print(f'{uname} left the chat')
                     connected = False
+                    global connection_cl
+                    connection_cl = 1
+                    userinput.join()
+                    conn.close()
+                    return
                 print(f"\t\t\t\t\t\t{uname} > {message}")
-        print(f'{uname} left the chat , hit enter to close connection')
         conn.close()
         return
     except (ConnectionResetError, ConnectionAbortedError):
@@ -82,22 +104,41 @@ def handle_client(conn, addr):
         print('There was some problem connecting you to the chat, please try again in some time')
 
 
+user_input = ''
+message_val = ''
+
 def send_message(conn, addr):
     conn.send(username.encode(FORMAT))
+    global userinput
+    global connection_cl
+    global message_val
     while(conn.fileno()):
-        usr_input = input()
-        message_val = usr_input
-        message = message_val.encode(FORMAT)
-        message_length = len(message)
-        send_len = str(message_length).encode(FORMAT)
-        send_len += b' '*(HEADER-len(send_len))
-        try:
-            conn.send(send_len)
-            conn.send(message)
-            if usr_input == DISCONNECT_MESSAGE:
-                break
-        except:
-            print('Connection closed')
+        if not userinput.is_alive():
+            global user_input
+            if user_input != '':
+                message_val = user_input
+                another = user_input
+            user_input = ''
+            userinput = threading.Thread(target=readinput, args=())
+            userinput.start()
+        if message_val != '':
+            message = message_val.encode(FORMAT)
+            message_val = ''
+            message_length = len(message)
+            send_len = str(message_length).encode(FORMAT)
+            send_len += b' '*(HEADER-len(send_len))
+            try:
+                conn.send(send_len)
+                conn.send(message)
+                if another == DISCONNECT_MESSAGE:
+                    conn.close()
+                    os._exit(0)
+            except:
+                print('Connection closed')
+                conn.close()
+                return
+        if connection_cl == 1:
+            connection_cl = 0
             conn.close()
             return
     conn.close()
