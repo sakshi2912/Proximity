@@ -1,116 +1,82 @@
-import base64
-import colorama
-from colorama import init
-from pyfiglet import figlet_format
 import socket
-from sys import platform
-from termcolor import cprint
-import threading
-import os
-import time
-import signal
+import select
+import errno
 
-if platform == "linux" or platform == "linux2":
-    os.system('clear')
-elif platform == "win32":
-    os.system('cls')
-else:
-    print('Unsupported OS')
-    os._exit(1)
+HEADER_LENGTH = 10
 
-colorama.init()
-cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
+IP = "127.0.0.1"
+PORT = 1234
+my_username = input("Username: ")
 
-passkey = input("Enter the Chat-Room's accesskey: ")
-#username = input("Enter a username : ")
-PORT = 5050
-FORMAT = 'utf-8'
-HEADER = 64
-DISCONNECT_MESSAGE = "!DISCONNECT"
-# connect to the socket
+# Create a socket
+# socket.AF_INET - address family, IPv4, some otehr possible are AF_INET6, AF_BLUETOOTH, AF_UNIX
+# socket.SOCK_STREAM - TCP, conection-based, socket.SOCK_DGRAM - UDP, connectionless, datagrams, socket.SOCK_RAW - raw IP packets
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+# Connect to a given ip and port
+client_socket.connect((IP, PORT))
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# Set connection to non-blocking state, so .recv() call won;t block, just return some exception we'll handle
+client_socket.setblocking(False)
 
-def decode_key(valu):
+# Prepare username and header and send them
+# We need to encode username to bytes, then count number of bytes and prepare header of fixed size, that we encode to bytes as well
+username = my_username.encode('utf-8')
+username_header = f"{len(username):<{HEADER_LENGTH}}".encode('utf-8')
+client_socket.send(username_header + username)
+
+while True:
+
+    # Wait for user to input a message
+    message = input(f'{my_username} > ')
+
+    # If message is not empty - send it
+    if message:
+
+        # Encode message to bytes, prepare header and convert to bytes, like for username above, then send
+        message = message.encode('utf-8')
+        message_header = f"{len(message):<{HEADER_LENGTH}}".encode('utf-8')
+        client_socket.send(message_header + message)
+
     try:
-        decoded_data = base64.b64decode(valu)
-        dec_ip = decoded_data.decode('utf-8')
-        
-        if len(dec_ip) == 8:
-            dec_ip = '192.168' + dec_ip.lstrip('0')
-        elif len(dec_ip) == 15:
-            dec_ip = dec_ip.lstrip('0')
-        elif len(dec_ip)==0: 
-            print("Please enter a passkey \n ")
-            passkey = input(" Re-enter your accesskey : ")
-            dec_ip = decode_key(passkey)
-        else:
-            print("Please enter the correct passkey \n ")
-            passkey = input(" Re-enter your accesskey : ")
-            dec_ip = decode_key(passkey)
-            
-    except (ConnectionRefusedError,UnicodeDecodeError,UnboundLocalError,base64.binascii.Error):
-        print("Please enter the correct passkey \n ")
-        passkey = input(" Re-enter your accesskey : ")
-        dec_ip = decode_key(passkey)    
+        # Now we want to loop over received messages (there might be more than one) and print them
+        while True:
 
-    finally:
-        return dec_ip
+            # Receive our "header" containing username length, it's size is defined and constant
+            username_header = client_socket.recv(HEADER_LENGTH)
 
-SERVER = decode_key(passkey)
-ADDR = (SERVER, PORT)
+            # If we received no data, server gracefully closed a connection, for example using socket.close() or socket.shutdown(socket.SHUT_RDWR)
+            if not len(username_header):
+                print('Connection closed by the server')
+                sys.exit()
 
-try:
-    client.connect(ADDR)
-    print(f'\n[CONNECTED TO {SERVER}]')
-except ConnectionRefusedError:
-        print("There is no such room available in your network \n ")
-        passkey = input(" Re-enter your accesskey : ")
-        dec_ip = decode_key(passkey)
+            # Convert header to int value
+            username_length = int(username_header.decode('utf-8').strip())
 
-#result = client.connect_ex(ADDR)
+            # Receive and decode username
+            username = client_socket.recv(username_length).decode('utf-8')
 
-def send(u_message):
-    message_val = f"[{username}] {u_message}"
-    message = message_val.encode(FORMAT)
-    message_length = len(message)
-    send_len = str(message_length).encode(FORMAT)
-    # padd it to header
-    send_len += b' '*(HEADER-len(send_len))
-    client.send(send_len)
-    client.send(message)
+            # Now do the same for message (as we received username, we received whole message, there's no need to check if it has any length)
+            message_header = client_socket.recv(HEADER_LENGTH)
+            message_length = int(message_header.decode('utf-8').strip())
+            message = client_socket.recv(message_length).decode('utf-8')
 
-def send_message():
-    while(1):
-        try:
-            send(input())
-        except:
-            print('Cannot send message')
-            client.close()
-    client.close()
-        
-def rec_msg():
-    try:
-        connected = True
-        while(connected):
-            # message=conn.recv(1024)
-            message_length = client.recv(HEADER).decode(FORMAT)
-            if message_length:
-                message_length = int(message_length)
-                message = client.recv(message_length).decode(FORMAT)
-                if message == DISCONNECT_MESSAGE:
-                    connected = False
-                print(f"\t\t\t\t\t\t{message}")
-        print('The person has left the chat')
-    except (ConnectionResetError,ConnectionAbortedError):
-        print('The connection is closed , you must restart the terminal')
-    except (OSError,ConnectionRefusedError):
-        print('There was some problem connecting you to the chat, please try again in some time')
-    client.close()
-    
-username=input("\nEnter your username : ")
-send_thread = threading.Thread(target=send_message)
-rec_thread = threading.Thread(target=rec_msg)
-send_thread.start()
-rec_thread.start()
+            # Print message
+            print(f'{username} > {message}')
+
+    except IOError as e:
+        # This is normal on non blocking connections - when there are no incoming data error is going to be raised
+        # Some operating systems will indicate that using AGAIN, and some using WOULDBLOCK error code
+        # We are going to check for both - if one of them - that's expected, means no incoming data, continue as normal
+        # If we got different error code - something happened
+        if e.errno != errno.EAGAIN and e.errno != errno.EWOULDBLOCK:
+            print('Reading error: {}'.format(str(e)))
+            sys.exit()
+
+        # We just did not receive anything
+        continue
+
+    except Exception as e:
+        # Any other exception - something happened, exit
+        print('Reading error: '.format(str(e)))
+        sys.exit()
