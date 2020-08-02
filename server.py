@@ -61,18 +61,21 @@ except:
 
 def handle_client(conn, addr):
     try:
-        print(f"\n[New connection from {addr[0]}]")
+        uname=conn.recv(10).decode(FORMAT)
+        #print(f"\n[New connection from {addr[0]}]")
+        print(f"{uname} joined the chat")
         connected = True
         while(connected):
             message_length = conn.recv(HEADER).decode(FORMAT)
             if message_length:
                 message_length = int(message_length)
                 message = conn.recv(message_length).decode(FORMAT)
-                if message[-(len(DISCONNECT_MESSAGE)):] == DISCONNECT_MESSAGE:
+                if message == DISCONNECT_MESSAGE:
                     connected = False
-                print(f"\t\t\t\t\t\t{message}")
-        print('The person has left the chat')
+                print(f"\t\t\t\t\t\t{uname} > {message}")
+        print(f'{uname} left the chat , hit enter to close connection')
         conn.close()
+        return
     except (ConnectionResetError,ConnectionAbortedError):
         print('The connection is closed , you must restart the terminal')
     except OSError:
@@ -81,20 +84,21 @@ def handle_client(conn, addr):
 
 
 def send_message(conn, addr):
+    conn.send(username.encode(FORMAT))
     while(conn.fileno()):
+        usr_input = input()
+        message_val = usr_input
+        message = message_val.encode(FORMAT)
+        message_length = len(message)
+        send_len = str(message_length).encode(FORMAT)
+        send_len += b' '*(HEADER-len(send_len))
         try:
-            usr_input = input()
-            message_val = f"[{username}] {usr_input}"
-            message = message_val.encode(FORMAT)
-            message_length = len(message)
-            send_len = str(message_length).encode(FORMAT)
-            send_len += b' '*(HEADER-len(send_len))
             conn.send(send_len)
             conn.send(message)
             if usr_input == DISCONNECT_MESSAGE:
                 break
         except:
-            print('Cannot send message')
+            print('Connection closed')
             conn.close()
             return
     conn.close()

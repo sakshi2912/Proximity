@@ -72,7 +72,7 @@ except ConnectionRefusedError:
 
 
 def send(u_message):
-    message_val = f"[{username}] {u_message}"
+    message_val = u_message
     message = message_val.encode(FORMAT)
     message_length = len(message)
     send_len = str(message_length).encode(FORMAT)
@@ -80,9 +80,14 @@ def send(u_message):
     send_len += b' '*(HEADER-len(send_len))
     client.send(send_len)
     client.send(message)
+    if u_message == DISCONNECT_MESSAGE :
+        print('You have disconnected')
+        client.close()
+        os._exit(0)
 
 
 def send_message():
+    client.send(username.encode(FORMAT))
     while(client.fileno()):
         try:
             send(input())
@@ -95,16 +100,17 @@ def send_message():
 
 def rec_msg():
     try:
+        uname=client.recv(10).decode(FORMAT)
         while(True):
             message_length = client.recv(HEADER).decode(FORMAT)
             if message_length:
                 message_length = int(message_length)
                 message = client.recv(message_length).decode(FORMAT)
-                if message[-(len(DISCONNECT_MESSAGE)):] == DISCONNECT_MESSAGE:
+                if message == DISCONNECT_MESSAGE:
                     client.close()
                     break
-                print(f"\t\t\t\t\t\t{message}")
-        print('The server has left the chat')
+                print(f"\t\t\t\t\t\t{uname} > {message}")
+        print(f'{uname} left the chat')
         
     except (ConnectionResetError, ConnectionAbortedError):
         print('The connection is closed , you must restart the terminal')
