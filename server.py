@@ -81,7 +81,7 @@ def handle_client(conn, addr):
 
 
 def send_message(conn, addr):
-    while(1):
+    while(conn.fileno()):
         try:
             usr_input = input()
             message_val = f"[{username}] {usr_input}"
@@ -96,6 +96,8 @@ def send_message(conn, addr):
         except:
             print('Cannot send message')
             conn.close()
+            return
+    conn.close()
     os._exit(0)
 
 
