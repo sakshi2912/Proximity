@@ -102,8 +102,16 @@ def rec_msg():
     try:
         uname = client.recv(10).decode(FORMAT)
         while(True):
-            message_length = client.recv(HEADER).decode(FORMAT)
-            if message_length:
+            try:
+                message_length = client.recv(HEADER).decode(FORMAT)
+                message_length = int(message_length)
+                message = client.recv(message_length).decode(FORMAT)
+                if message == DISCONNECT_MESSAGE:
+                    client.close()
+                    break
+                print(f"\t\t\t\t\t\t{uname} > {message}")
+            except(ValueError):
+                message_length = client.recv(HEADER).decode(FORMAT)
                 message_length = int(message_length)
                 message = client.recv(message_length).decode(FORMAT)
                 if message == DISCONNECT_MESSAGE:
