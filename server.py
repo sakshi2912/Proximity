@@ -96,12 +96,14 @@ def send_message(conn, addr):
             conn.send(send_len)
             conn.send(message)
             if usr_input == DISCONNECT_MESSAGE:
-                break
+                conn.close()
+                os._exit(0)
         except:
+            break
             print('Connection closed')
             conn.close()
-            return
     conn.close()
+    start_sockets()
     os._exit(0)
 
 

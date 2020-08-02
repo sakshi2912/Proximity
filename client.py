@@ -104,7 +104,11 @@ def rec_msg():
         while(True):
             message_length = client.recv(HEADER).decode(FORMAT)
             if message_length:
-                message_length = int(message_length)
+                try:
+                    message_length = int(message_length)
+                except:
+                    exit(0)
+
                 message = client.recv(message_length).decode(FORMAT)
                 if message == DISCONNECT_MESSAGE:
                     client.close()
