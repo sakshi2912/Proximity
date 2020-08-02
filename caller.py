@@ -8,10 +8,11 @@ from termcolor import cprint
 import threading
 import os
 
+
 def main():
 
     def getoption():
-        option =input("\n\t ENTER OPTION: ")
+        option = input("\n\t ENTER OPTION: ")
         callfile(option)
 
     def callfile(option):
@@ -30,5 +31,6 @@ def main():
     print("\t 2) Join existing Chat-Room")
 
     getoption()
+
 
 main()

@@ -61,7 +61,7 @@ except:
 
 def handle_client(conn, addr):
     try:
-        uname=conn.recv(10).decode(FORMAT)
+        uname = conn.recv(10).decode(FORMAT)
         #print(f"\n[New connection from {addr[0]}]")
         print(f"{uname} joined the chat")
         connected = True
@@ -76,11 +76,10 @@ def handle_client(conn, addr):
         print(f'{uname} left the chat , hit enter to close connection')
         conn.close()
         return
-    except (ConnectionResetError,ConnectionAbortedError):
+    except (ConnectionResetError, ConnectionAbortedError):
         print('The connection is closed , you must restart the terminal')
     except OSError:
         print('There was some problem connecting you to the chat, please try again in some time')
-        
 
 
 def send_message(conn, addr):
@@ -96,14 +95,12 @@ def send_message(conn, addr):
             conn.send(send_len)
             conn.send(message)
             if usr_input == DISCONNECT_MESSAGE:
-                conn.close()
-                os._exit(0)
+                break
         except:
-            break
             print('Connection closed')
             conn.close()
+            return
     conn.close()
-    start_sockets()
     os._exit(0)
 
 
@@ -111,13 +108,13 @@ def start_sockets():
     server.listen()
     while(1):
         conn, addr = server.accept()
-        client_thread = threading.Thread(target=handle_client, args=(conn, addr))
+        client_thread = threading.Thread(
+            target=handle_client, args=(conn, addr))
         send_thread = threading.Thread(target=send_message, args=(conn, addr))
         client_thread.start()
         send_thread.start()
         print(f"\n[ACTIVE CONNECTIONS] {threading.activeCount()-1}")
 
-    
 
 print('Starting server...\n')
 username = input('Enter your username : ')
