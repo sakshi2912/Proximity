@@ -1,18 +1,163 @@
-import socket 
+import socket
+import threading
 import os
-# 2 args , ipv4/6 and tcp/udp
-s = socket.socket()
-print("Socket created")
-#one obj : 2 args, ip addr and port number 
-s.bind((str(os.system("ifconfig | grep 192 | awk -F ' ' '{print $2}'")),9999))
-#queue for connections (number of clients) 
-s.listen(3)
-print("Waiting for connections")
+from sys import platform
+import base64
+from colorama import init
+import colorama
+from pyfiglet import figlet_format
+from termcolor import cprint
+import sys
+from subprocess import check_output
+import time
 
-while(1):
-    #c is socket and addr is the address
-    c,addr=s.accept()
-    print("Connected to :",addr)
-    print(c.recv(1024).decode('utf-8'))
-    c.send(bytes('Welcome to sak','utf-8'))
-    c.close()
+if platform == "linux" or platform == "linux2":
+    os.system('clear')
+    if (os.path.exists('ip.txt')):
+        os.remove('ip.txt')
+    os.system("ifconfig | grep 192 | awk -F ' ' '{print $2}' > ip.txt")
+    f = open('ip.txt', 'r')
+    line = f.readline()
+    os.remove('ip.txt')
+    SERVER = line.strip()
+elif platform == "win32":
+    os.system('cls')
+    SERVER = socket.gethostbyname(socket.gethostname())
+else:
+    print('Unsupported OS')
+    exit(1)
+
+colorama.init()
+cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
+
+PORT = 5050
+
+
+def print_to_stdout(*a):
+    print(*a, file=sys.stdout)
+
+
+def encodefunc(val):
+    encoded_data = base64.b64encode(bytes(val, 'utf-8'))
+    print(
+        f"\n\n-------- {username}'s Chat-Room accesskey : ( {encoded_data.decode('utf-8')} ) --------")
+
+
+def getpasskey(str1):
+    if str1[0:7] == '192.168':
+        encodefunc(str1[7:].zfill(8))
+    else:
+        encodefunc(str1.zfill(15))
+
+
+ADDR = (SERVER, PORT)
+FORMAT = 'utf-8'
+# header of 64 bytes : tells us the length of the message coming
+HEADER = 64
+DISCONNECT_MESSAGE = "!DISCONNECT"
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+try:
+    server.bind(ADDR)
+except:
+    print('A room already exists in this server')
+    exit(1)
+
+
+def readinput():
+    global user_input
+    user_input = input()
+    return
+
+
+userinput = threading.Thread(target=readinput, args=())
+connection_cl = 0
+
+
+def handle_client(conn, addr):
+    try:
+        global userinput
+        uname = conn.recv(10).decode(FORMAT)
+        #print(f"\n[New connection from {addr[0]}]")
+        print(f"{uname} joined the chat")
+        connected = True
+        while(connected):
+            message_length = conn.recv(HEADER).decode(FORMAT)
+            if message_length:
+                message_length = int(message_length)
+                message = conn.recv(message_length).decode(FORMAT)
+                if message == DISCONNECT_MESSAGE:
+                    print(f"\t\t\t\t\t\t{uname} > {message}")
+                    print(f'{uname} left the chat')
+                    connected = False
+                    global connection_cl
+                    connection_cl = 1
+                    userinput.join()
+                    conn.close()
+                    return
+                print(f"\t\t\t\t\t\t{uname} > {message}")
+        conn.close()
+        return
+    except (ConnectionResetError, ConnectionAbortedError):
+        print('The connection is closed , you must restart the terminal')
+    except OSError:
+        print('There was some problem connecting you to the chat, please try again in some time')
+
+
+user_input = ''
+message_val = ''
+
+def send_message(conn, addr):
+    conn.send(username.encode(FORMAT))
+    global userinput
+    global connection_cl
+    global message_val
+    while(conn.fileno()):
+        if not userinput.is_alive():
+            global user_input
+            if user_input != '':
+                message_val = user_input
+                another = user_input
+            user_input = ''
+            userinput = threading.Thread(target=readinput, args=())
+            userinput.start()
+        if message_val != '':
+            message = message_val.encode(FORMAT)
+            message_val = ''
+            message_length = len(message)
+            send_len = str(message_length).encode(FORMAT)
+            send_len += b' '*(HEADER-len(send_len))
+            try:
+                conn.send(send_len)
+                conn.send(message)
+                if another == DISCONNECT_MESSAGE:
+                    conn.close()
+                    os._exit(0)
+            except:
+                print('Connection closed')
+                conn.close()
+                return
+        if connection_cl == 1:
+            connection_cl = 0
+            conn.close()
+            return
+    conn.close()
+    os._exit(0)
+
+
+def start_sockets():
+    server.listen()
+    while(1):
+        conn, addr = server.accept()
+        client_thread = threading.Thread(
+            target=handle_client, args=(conn, addr))
+        send_thread = threading.Thread(target=send_message, args=(conn, addr))
+        client_thread.start()
+        send_thread.start()
+        print(f"\n[ACTIVE CONNECTIONS] {threading.activeCount()-1}")
+
+
+print('Starting server...\n')
+username = input('Enter your username : ')
+getpasskey(SERVER)
+start_sockets()
