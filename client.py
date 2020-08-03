@@ -80,7 +80,7 @@ def send(u_message):
     send_len += b' '*(HEADER-len(send_len))
     client.send(send_len)
     client.send(message)
-    if u_message == DISCONNECT_MESSAGE:
+    if u_message == 'exit':
         print('You have disconnected')
         client.close()
         os._exit(0)
@@ -114,11 +114,12 @@ def rec_msg():
                 message_length = client.recv(HEADER).decode(FORMAT)
                 message_length = int(message_length)
                 message = client.recv(message_length).decode(FORMAT)
-                if message == DISCONNECT_MESSAGE:
+                if message == 'exit':
                     client.close()
                     break
                 print(f"\t\t\t\t\t\t{uname} > {message}")
         print(f'{uname} left the chat')
+        os._exit(0)
 
     except (ConnectionResetError, ConnectionAbortedError):
         print('The connection is closed , you must restart the terminal')
