@@ -68,13 +68,16 @@ cache_msg = queue.Queue()
 
 def readinput():
     global user_input
+    global DISCONNECT_MESSAGE
     user_input = input()
+
     cache_msg.put(user_input)
     return
 
 
 userinput = threading.Thread(target=readinput, args=())
 connection_cl = 0
+pre_message = 1
 
 
 def handle_client(conn, addr):
@@ -82,6 +85,8 @@ def handle_client(conn, addr):
         global no_client
         
         global userinput
+
+
         global connection_cl
         uname = conn.recv(10).decode(FORMAT)
         #print(f"\n[New connection from {addr[0]}]")
@@ -111,10 +116,9 @@ def handle_client(conn, addr):
 user_input = ''
 message_val = ''
 
-def send_message(conn, addr):
-    conn.send(username.encode(FORMAT))
+
+def listen_to_input():
     global userinput
-    global connection_cl
     global message_val
     global cache_msg
     global no_client
@@ -176,9 +180,10 @@ def send_message(conn, addr):
 def start_sockets():
     server.listen()
     while(1):
+        listenToUser_thread = threading.Thread(target=listen_to_input, args=())
+        listenToUser_thread.start()
         conn, addr = server.accept()
-        client_thread = threading.Thread(
-            target=handle_client, args=(conn, addr))
+        client_thread = threading.Thread(target=handle_client, args=(conn, addr))
         send_thread = threading.Thread(target=send_message, args=(conn, addr))
         client_thread.start()
         send_thread.start()
