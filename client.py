@@ -27,7 +27,7 @@ passkey = input("Enter the Chat-Room's accesskey: ")
 PORT = 5050
 FORMAT = 'utf-8'
 HEADER = 64
-DISCONNECT_MESSAGE = "!DISCONNECT"
+DISCONNECT_MESSAGE = "exit"
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -80,7 +80,7 @@ def send(u_message):
     send_len += b' '*(HEADER-len(send_len))
     client.send(send_len)
     client.send(message)
-    if u_message == 'exit':
+    if u_message == DISCONNECT_MESSAGE:
         print('You have disconnected')
         client.close()
         os._exit(0)
@@ -102,19 +102,11 @@ def rec_msg():
     try:
         uname = client.recv(10).decode(FORMAT)
         while(True):
-            try:
-                message_length = client.recv(HEADER).decode(FORMAT)
+            message_length = client.recv(HEADER).decode(FORMAT)
+            if message_length:
                 message_length = int(message_length)
                 message = client.recv(message_length).decode(FORMAT)
                 if message == DISCONNECT_MESSAGE:
-                    client.close()
-                    break
-                print(f"\t\t\t\t\t\t{uname} > {message}")
-            except(ValueError):
-                message_length = client.recv(HEADER).decode(FORMAT)
-                message_length = int(message_length)
-                message = client.recv(message_length).decode(FORMAT)
-                if message == 'exit':
                     client.close()
                     break
                 print(f"\t\t\t\t\t\t{uname} > {message}")
