@@ -66,8 +66,11 @@ except:
 
 def readinput():
     global user_input
+    global DISCONNECT_MESSAGE
     user_input = input()
-    print("=== LISTENING THREAD DIEING ===")
+    if (user_input == DISCONNECT_MESSAGE) and (pre_message == 1):
+        os._exit(0)
+    os.system('echo " = DYING" >> ./check')
     return
 
 
@@ -121,13 +124,13 @@ def listen_to_input():
             global user_input
             if pre_message == 1:
                 user_input = ''
-                print("=== DISCARDING THIS MESSAGE ===")
             if user_input != '':
                 message_val = user_input
             user_input = ''
-            print("=== CREATING LISTENING THREAD ===")
-            userinput = threading.Thread(target=readinput, args=())
-            userinput.start()
+            if not userinput.is_alive():
+                os.system('echo "CREATING + " >> ./check')
+                userinput = threading.Thread(target=readinput, args=())
+                userinput.start()
 
 
 def send_message(conn, addr):
@@ -164,13 +167,13 @@ def send_message(conn, addr):
 def start_sockets():
     server.listen()
     while(1):
+        listenToUser_thread = threading.Thread(target=listen_to_input, args=())
+        listenToUser_thread.start()
         conn, addr = server.accept()
         client_thread = threading.Thread(target=handle_client, args=(conn, addr))
         send_thread = threading.Thread(target=send_message, args=(conn, addr))
-        listenToUser_thread = threading.Thread(target=listen_to_input, args=())
         client_thread.start()
         send_thread.start()
-        listenToUser_thread.start()
         print(f"\n[ACTIVE CONNECTIONS] {threading.activeCount()-1}")
 
 
