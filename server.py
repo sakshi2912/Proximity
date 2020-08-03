@@ -67,19 +67,23 @@ except:
 def readinput():
     global user_input
     user_input = input()
+    print("=== LISTENING THREAD DIEING ===")
     return
 
 
 userinput = threading.Thread(target=readinput, args=())
 connection_cl = 0
+pre_message = 1
 
 
 def handle_client(conn, addr):
     try:
         global userinput
+        global pre_message
         uname = conn.recv(10).decode(FORMAT)
         #print(f"\n[New connection from {addr[0]}]")
         print(f"{uname} joined the chat")
+        pre_message = 0
         connected = True
         while(connected):
             message_length = conn.recv(HEADER).decode(FORMAT)
@@ -89,6 +93,7 @@ def handle_client(conn, addr):
                 if message == DISCONNECT_MESSAGE:
                     print(f"\t\t\t\t\t\t{uname} > {message}")
                     print(f'{uname} left the chat')
+                    pre_message = 1
                     connected = False
                     global connection_cl
                     connection_cl = 1
@@ -107,21 +112,32 @@ def handle_client(conn, addr):
 user_input = ''
 message_val = ''
 
+
+def listen_to_input():
+    global userinput
+    global message_val
+    while(1):
+        if not userinput.is_alive():
+            global user_input
+            if pre_message == 1:
+                user_input = ''
+                print("=== DISCARDING THIS MESSAGE ===")
+            if user_input != '':
+                message_val = user_input
+            user_input = ''
+            print("=== CREATING LISTENING THREAD ===")
+            userinput = threading.Thread(target=readinput, args=())
+            userinput.start()
+
+
 def send_message(conn, addr):
     conn.send(username.encode(FORMAT))
     global userinput
     global connection_cl
     global message_val
     while(conn.fileno()):
-        if not userinput.is_alive():
-            global user_input
-            if user_input != '':
-                message_val = user_input
-                another = user_input
-            user_input = ''
-            userinput = threading.Thread(target=readinput, args=())
-            userinput.start()
         if message_val != '':
+            another = message_val
             message = message_val.encode(FORMAT)
             message_val = ''
             message_length = len(message)
@@ -149,11 +165,12 @@ def start_sockets():
     server.listen()
     while(1):
         conn, addr = server.accept()
-        client_thread = threading.Thread(
-            target=handle_client, args=(conn, addr))
+        client_thread = threading.Thread(target=handle_client, args=(conn, addr))
         send_thread = threading.Thread(target=send_message, args=(conn, addr))
+        listenToUser_thread = threading.Thread(target=listen_to_input, args=())
         client_thread.start()
         send_thread.start()
+        listenToUser_thread.start()
         print(f"\n[ACTIVE CONNECTIONS] {threading.activeCount()-1}")
 
 
