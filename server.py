@@ -4,74 +4,78 @@ import os
 host = '127.0.0.1'
 port = 55455
 
-# Starting Server
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((host, port))
 server.listen()
 
-# Lists For Clients and Their uname_list
-clients = []
-uname_list = []
+
+clients_dict = {}
 
 def broadcast(message):
-    for client in clients:
-        client.send(message)
+    for client in list(clients_dict.keys()):
+        try:
+            client.send(message)
+        except:
+            print('Could not send message')
+
         
-def handle(client):
+def rec_message(client):
     while True:
         try:
-            # Broadcasting Messages
-            message = client.recv(1024)
-            print(message.decode('utf-8'))
+            message = client.recv(1024).decode('utf-8')
+            if message == 'exit':
+                user = clients_dict[client]
+                print(f'{user} disconnected ')
+                client.close()
+                del clients_dict[client]
+                broadcast(f'{user} left!'.encode('utf-8'))
+                break
             
-            broadcast(message)
+            else:
+                print(message)
+                broadcast(message.encode('utf-8'))
             
         except:
-            # Removing And Closing Clients
-            index = clients.index(client)
-            clients.remove(client)
+            user = clients_dict[client]
+            print(f'{user} disconnected ')
             client.close()
-            uname = uname_list[index]
-            broadcast('{} left!'.format(uname).encode('utf-8'))
-            uname_list.remove(uname)
+            del clients_dict[client]
+            broadcast(f'{user} left!'.encode('utf-8'))
             break
         
-def handle2():
+def send_message():
     while True:
         try:
-            # Broadcasting Messages
-            message = input()    
+            message = input()
+            b_message = f"{server_name}  {message}"    
             if message == 'exit':
                 broadcast('Server left'.encode('utf-8'))
                 os._exit(0)
-            broadcast(message.encode('utf-8'))
+            broadcast(b_message.encode('utf-8'))
             
         except:
             break
         
-def receive():
+def accept_conn():
     while True:
-        # Accept Connection
+        
         client, address = server.accept()
-        print("Connected with {}".format(str(address)))
 
-        # Request And Store uname
-        client.send('NICK'.encode('utf-8'))
-        uname = client.recv(1024).decode('utf-8')
-        uname_list.append(uname)
-        clients.append(client)
+        client.send('Connect'.encode('utf-8'))
+        clients_dict[client] = client.recv(1024).decode('utf-8')
+        print(f"{clients_dict[client]} joined the server")
 
-        # Print And Broadcast uname
-        print("uname is {}".format(uname))
-        broadcast("{} joined!".format(uname).encode('utf-8'))
+        broadcast(f"{clients_dict[client]} joined!".encode('utf-8'))
         client.send('Connected to server!'.encode('utf-8'))
 
-        # Start Handling Thread For Client
-        thread = threading.Thread(target=handle, args=(client,))
+        thread = threading.Thread(target=rec_message, args=(client,))
         thread.start()
-        print('Active threads'+ str(threading.active_count()-1))
+        print('Active threads : '+ str(threading.active_count()-1))
 
-server_name = input('Enter server name')
-thread2 = threading.Thread(target=handle2, args=())
+print('Creating server')
+server_name = input('Enter server name : ')
+thread2 = threading.Thread(target=send_message)
 thread2.start()
-receive()
+print('Created server')
+accept_conn()
+
