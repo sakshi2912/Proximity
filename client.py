@@ -17,10 +17,17 @@ def receive():
                 client.send(username.encode('utf-8'))
             
             elif message == 'Server left':
-                print('You will be disconnected')
+                print('\nServer has disconnected\n')
                 os._exit(0)
+
+            elif message[-5:] == 'left!':
+                print('\n \t',messge,'\n')
+
+            elif message == 'Connected to server!':
+                print('\n \t Connected to the Server! \n')
+
             else:
-                print(message)
+                print('\t\t\t\t',message)
         except:
             print("An error occured!")
             client.close()

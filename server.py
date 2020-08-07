@@ -17,7 +17,7 @@ def broadcast(message,current_client):
         try:
             client.send(message)
         except:
-            print('Could not send message')
+            print('\n \t Could not send message \n')
 
         
 def rec_message(client):
@@ -26,22 +26,22 @@ def rec_message(client):
             message = client.recv(1024).decode('utf-8')
             if message == 'exit':
                 user = clients_dict[client]
-                print(f'{user} disconnected ')
-                client.close()
+                print(f'\n \t [{user}] disconnected \n')
                 del clients_dict[client]
-                broadcast(f'{user} left!'.encode('utf-8'),client)
+                client.close()
+                broadcast(f'\n \t [{user}] left! \n'.encode('utf-8'),client)
                 break
             
             else:
-                print(message)
+                print('\t\t\t\t',message)
                 broadcast(message.encode('utf-8'),client)
             
         except:
             user = clients_dict[client]
-            print(f'{user} disconnected ')
+            print(f'\n \t [{user}] disconnected \n')
             client.close()
             del clients_dict[client]
-            broadcast(f'{user} left!'.encode('utf-8'),client)
+            broadcast(f'\n \t [{user}] left! \n'.encode('utf-8'),client)
             break
         
 def send_message():
@@ -64,9 +64,8 @@ def accept_conn():
 
         client.send('Connect'.encode('utf-8'))
         clients_dict[client] = client.recv(1024).decode('utf-8')
-        print(f"{clients_dict[client]} joined the server")
-
-        broadcast(f"{clients_dict[client]} joined!".encode('utf-8'),client)
+        print(f"\n \t [{clients_dict[client]}] joined the server \n")
+        broadcast(f"\n \t [{clients_dict[client]}] joined! \n".encode('utf-8'),client)
         client.send('Connected to server!'.encode('utf-8'))
 
         thread = threading.Thread(target=rec_message, args=(client,))
