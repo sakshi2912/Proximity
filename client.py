@@ -2,9 +2,8 @@ import socket
 import threading
 import os
 
-nickname = input("Choose your nickname: ")
+username = input("Enter your username: ")
 
-# Connecting To Server
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(('127.0.0.1', 55455))
 
@@ -12,11 +11,10 @@ client.connect(('127.0.0.1', 55455))
 def receive():
     while True:
         try:
-            # Receive Message From Server
-            # If 'NICK' Send Nickname
+
             message = client.recv(1024).decode('utf-8')
             if message == 'Connect':
-                client.send(nickname.encode('utf-8'))
+                client.send(username.encode('utf-8'))
             
             elif message == 'Server left':
                 print('You will be disconnected')
@@ -24,7 +22,6 @@ def receive():
             else:
                 print(message)
         except:
-            # Close Connection When Error
             print("An error occured!")
             client.close()
             break
@@ -38,7 +35,7 @@ def write():
             print('You will be disconnected')
             os._exit(0)
         else:
-            message = f'{nickname} {input_val}'
+            message = f'[{username}] : {input_val}'
             client.send(message.encode('utf-8'))
         
 receive_thread = threading.Thread(target=receive)
