@@ -2,16 +2,54 @@ import socket
 import threading
 import os
 import signal
+from sys import platform
+import base64
 
-host = '127.0.0.1'
-port = 55455
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind((host, port))
-server.listen()
-
+if platform == "linux" or platform == "linux2":
+    os.system('clear')
+    if (os.path.exists('ip.txt')):
+        os.remove('ip.txt')
+    os.system("ifconfig | grep 192 | awk -F ' ' '{print $2}' > ip.txt")
+    f = open('ip.txt', 'r')
+    line = f.readline()
+    os.remove('ip.txt')
+    IP = line.strip()
+elif platform == "win32":
+    os.system('cls')
+    IP = socket.gethostbyname(socket.gethostname())
+else:
+    print('Unsupported OS')
+    exit(1)
 
 clients_dict = {}
+print('Creating server')
+server_name = input('Enter server name : ')
+clients_dict['Server'] = server_name
+
+PORT = 5050
+
+
+def encodefunc(val):
+    encoded_data = base64.b64encode(bytes(val, 'utf-8'))
+    print(
+        f"\n\n-------- {server_name}'s Chat-Room accesskey : ( {encoded_data.decode('utf-8')} ) --------")
+
+
+def getpasskey(str1):
+    if str1[0:7] == '192.168':
+        encodefunc(str1[7:].zfill(8))
+    else:
+        encodefunc(str1.zfill(15))
+
+getpasskey(IP)
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind((IP, PORT))
+server.listen()
+
+DISCONNECT_MESSAGE = "exit"
+
 
 
 def broadcast(message, current_client):
@@ -28,7 +66,7 @@ def rec_message(client):
     while True:
         try:
             message = client.recv(1024).decode('utf-8')
-            if message == 'exit':
+            if message == DISCONNECT_MESSAGE:
                 user = clients_dict[client]
                 print(f'\n \t [{user}] disconnected \n')
                 del clients_dict[client]
@@ -54,7 +92,7 @@ def send_message():
         try:
             message = input()
             b_message = f"[{server_name}] : {message}"
-            if message == 'exit':
+            if message == DISCONNECT_MESSAGE:
                 broadcast('Server left'.encode('utf-8'), 'Server')
                 os._exit(0)
             broadcast(b_message.encode('utf-8'), 'Server')
@@ -91,9 +129,6 @@ def accept_conn():
         print('Active threads : ' + str(threading.active_count()-1))
 
 
-print('Creating server')
-server_name = input('Enter server name : ')
-clients_dict['Server'] = server_name
 thread2 = threading.Thread(target=send_message)
 thread2.start()
 print('Created server')
