@@ -22,7 +22,8 @@ else:
 colorama.init()
 cprint(figlet_format('PROXIMITY', font="standard"), "cyan")
 
-passkey = input("Enter the Chat-Room's accesskey: ")
+#passkey = input("Enter the Chat-Room's accesskey: ")
+passkey = sys.argv[1]
 #username = input("Enter a username : ")
 PORT = 5050
 FORMAT = 'utf-8'

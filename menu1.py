@@ -31,7 +31,9 @@ def start_server(button):
     os.system("python3 server.py")
 
 def join_server(button):
-    os.system("python3 client.py")
+    os.system("python3 clientui.py")
+    raise urwid.ExitMainLoop()
+    #os.system("python3 client.py")
 
 
 welcomeText = pyfiglet.figlet_format('Proximity')
