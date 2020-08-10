@@ -25,6 +25,11 @@ else:
 clients_dict = {}
 print('Creating server')
 server_name = input('Enter server name : ')
+while not server_name.isalpha():
+        print(" \n \t ERROR: The Server name should only contain a set of alphabates. \n")
+        server_name = input('Enter server name : ')
+
+
 clients_dict['Server'] = server_name
 
 PORT = 5050

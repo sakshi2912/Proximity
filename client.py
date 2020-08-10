@@ -50,6 +50,9 @@ def decode_key(valu):
 IP = decode_key(passkey)
 
 username = input("Enter your username: ")
+while not username.isalpha():
+        print(" \n \t ERROR: The username should only contain alphabates. \n")
+        username = input('Enter server name : ')
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect((IP, PORT))
