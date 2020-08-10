@@ -26,8 +26,8 @@ clients_dict = {}
 print('Creating server')
 server_name = input('Enter server name : ')
 while not server_name.isalpha():
-        print(" \n \t ERROR: The Server name should only contain a set of alphabates. \n")
-        server_name = input('Enter server name : ')
+    print(" \n \t ERROR: The Server name should only contain a set of alphabates. \n")
+    server_name = input('Enter server name : ')
 
 
 clients_dict['Server'] = server_name
@@ -47,6 +47,7 @@ def getpasskey(str1):
     else:
         encodefunc(str1.zfill(15))
 
+
 getpasskey(IP)
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -54,7 +55,6 @@ server.bind((IP, PORT))
 server.listen()
 
 DISCONNECT_MESSAGE = "exit"
-
 
 
 def broadcast(message, current_client):
@@ -123,11 +123,21 @@ def accept_conn():
         client, address = server.accept()
 
         client.send('Connect'.encode('utf-8'))
-        clients_dict[client] = client.recv(1024).decode('utf-8')
+        client_name = client.recv(1024).decode('utf-8')
+        final_client_name = client_name
+        i = 1
+        while final_client_name in clients_dict.values():
+            final_client_name = f"{client_name}{i}"
+            i += 1
+
+        if client_name != final_client_name:
+            message = ('\n \t Username updated to ['+final_client_name+']\n').encode('utf-8')
+            client.send(message)
+        clients_dict[client] = final_client_name
         print(f"\n \t [{clients_dict[client]}] joined the server \n")
         broadcast(f"\n \t [{clients_dict[client]}] joined! \n".encode(
             'utf-8'), client)
-        client.send('Connected to server!'.encode('utf-8'))
+        client.send(f"Connected to {server_name}!".encode('utf-8'))
 
         thread = threading.Thread(target=rec_message, args=(client,))
         thread.start()

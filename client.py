@@ -70,8 +70,8 @@ def receive():
                 print('\nServer has disconnected\n')
                 os._exit(0)
 
-            elif message == 'Connected to server!':
-                print('\n \t Connected to the Server! \n')
+            elif 'Connected to' in message:
+                print('\n \t ',message,'\n')
 
             else:
                 print('\t\t\t\t', message)
