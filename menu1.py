@@ -80,8 +80,8 @@ class myclass2(Frame):
     def _on_change(self):
         global form_data
         self.save()
-        for key, value in self.data.items():
-            form_data[key] = value
+        value = self.data["username"]
+        form_data["username"] = value
 
     def _view(self):
         global form_data
@@ -125,8 +125,8 @@ class myclass3(Frame):
     def _on_change(self):
         global form_data
         self.save()
-        for key, value in self.data.items():
-            form_data[key] = value
+        value = self.data["passkey"]
+        form_data["passkey"] = value
 
     def _view(self):
         global form_data
