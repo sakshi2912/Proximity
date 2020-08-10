@@ -16,17 +16,15 @@ from asciimatics.screen import Screen
 from asciimatics.exceptions import ResizeScreenError, NextScene, StopApplication
 import os
 
-form_data = {
-    "TB": "Value1",
-}
+form_data = {"username": "", "passkey": ""}
 
 
 class myclass(Frame):
     def __init__(self, screen):
         super(myclass, self).__init__(
             screen,
-            screen.height * 2 // 3,
-            screen.width * 2 // 3,
+            screen.height * 3 // 4,
+            screen.width * 3 // 4,
             data=form_data,
             hover_focus=True,
             title="PROXIMITY",
@@ -34,17 +32,16 @@ class myclass(Frame):
         layout = Layout([1, 1, 1])
         self.add_layout(layout)
         layout.add_widget(Button("Create server", self._createserver), 0)
-        layout.add_widget(Button("Join server", self._view), 1)
+        layout.add_widget(Button("Join server", self._joinserver), 1)
         layout.add_widget(Button("Quit", self._quit), 2)
         self.fix()
 
-    def _view(self):
+    def _joinserver(self):
         self.save()
-        self._scene.add_effect(PopUpDialog(self._screen, "Hello", ["OK"]))
+        raise NextScene("menu3")
 
     def _createserver(self):
         self.save()
-        os.system("python3 server.py")
         raise NextScene("menu2")
 
     def _quit(self):
@@ -65,8 +62,8 @@ class myclass2(Frame):
     def __init__(self, screen):
         super(myclass2, self).__init__(
             screen,
-            screen.height * 2 // 3,
-            screen.width * 2 // 3,
+            screen.height * 3 // 4,
+            screen.width * 3 // 4,
             data=form_data,
             hover_focus=True,
             title="PROXIMITY",
@@ -74,7 +71,7 @@ class myclass2(Frame):
         layout = Layout([1, 1, 1])
         self.add_layout(layout)
         layout.add_widget(
-            Text(label="Enter username", name="TB", on_change=self._on_change), 0
+            Text(label="Username", name="username", on_change=self._on_change), 0
         )
         layout.add_widget(Button("View", self._view), 1)
         layout.add_widget(Button("Quit", self._quit), 2)
@@ -89,7 +86,52 @@ class myclass2(Frame):
     def _view(self):
         global form_data
         self.save()
-        message = "Hi , {}".format(form_data["TB"])
+        message = "Hi , {}".format(form_data["username"])
+        self._scene.add_effect(PopUpDialog(self._screen, message, ["OK"]))
+
+    def _quit(self):
+        self._scene.add_effect(
+            PopUpDialog(
+                self._screen, "Are you sure?", ["Yes", "No"], on_close=self._quit_on_yes
+            )
+        )
+
+    @staticmethod
+    def _quit_on_yes(selected):
+        # Yes is the first button
+        if selected == 0:
+            raise StopApplication("User requested exit")
+
+
+class myclass3(Frame):
+    def __init__(self, screen):
+        super(myclass3, self).__init__(
+            screen,
+            screen.height * 3 // 4,
+            screen.width * 3 // 4,
+            data=form_data,
+            hover_focus=True,
+            title="PROXIMITY",
+        )
+        layout = Layout([1, 1, 1])
+        self.add_layout(layout)
+        layout.add_widget(
+            Text(label="Passkey", name="passkey", on_change=self._on_change), 0,
+        )
+        layout.add_widget(Button("View", self._view), 1)
+        layout.add_widget(Button("Quit", self._quit), 2)
+        self.fix()
+
+    def _on_change(self):
+        global form_data
+        self.save()
+        for key, value in self.data.items():
+            form_data[key] = value
+
+    def _view(self):
+        global form_data
+        self.save()
+        message = "Passkey : {}".format(form_data["passkey"])
         self._scene.add_effect(PopUpDialog(self._screen, message, ["OK"]))
 
     def _quit(self):
@@ -111,6 +153,7 @@ def demo(screen):
     scenes = [
         Scene([myclass(screen)], -1, name="menu1"),
         Scene([myclass2(screen)], -1, name="menu2"),
+        Scene([myclass3(screen)], -1, name="menu3"),
     ]
     screen.play(scenes, stop_on_resize=True)
 
