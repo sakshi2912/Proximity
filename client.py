@@ -59,6 +59,7 @@ client.connect((IP, PORT))
 
 
 def receive():
+    global username
     while True:
         try:
 
@@ -72,6 +73,10 @@ def receive():
 
             elif 'Connected to' in message:
                 print('\n \t ',message,'\n')
+
+            elif 'Username updated to [' in message:
+                print(message)   
+                username = message[25:-1]
 
             else:
                 print('\t\t\t\t', message)

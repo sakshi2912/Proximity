@@ -131,13 +131,13 @@ def accept_conn():
             i += 1
 
         if client_name != final_client_name:
-            message = ('\n \t Username updated to ['+final_client_name+']\n').encode('utf-8')
+            message = ('\n \t Username updated to ['+final_client_name+']').encode('utf-8')
             client.send(message)
         clients_dict[client] = final_client_name
         print(f"\n \t [{clients_dict[client]}] joined the server \n")
         broadcast(f"\n \t [{clients_dict[client]}] joined! \n".encode(
             'utf-8'), client)
-        client.send(f"Connected to {server_name}!".encode('utf-8'))
+        client.send(f"Connected to [{server_name}]!".encode('utf-8'))
 
         thread = threading.Thread(target=rec_message, args=(client,))
         thread.start()
