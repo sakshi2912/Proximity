@@ -15,6 +15,7 @@ class clientType:
     IP = ""
     username = ""
     client = ""
+    dec_ip = ""
 
     def __init__(self):
         if platform == "linux" or platform == "linux2":
@@ -37,19 +38,19 @@ class clientType:
     def decode_key(self, valu):
         try:
             decoded_data = base64.b64decode(valu)
-            dec_ip = decoded_data.decode("utf-8")
-            if len(dec_ip) == 8:
-                dec_ip = "192.168" + dec_ip.lstrip("0")
-            elif len(dec_ip) == 15:
-                dec_ip = dec_ip.lstrip("0")
-            elif len(dec_ip) == 0:
+            self.dec_ip = decoded_data.decode("utf-8")
+            if len(self.dec_ip) == 8:
+                self.dec_ip = "192.168" + self.dec_ip.lstrip("0")
+            elif len(self.dec_ip) == 15:
+                self.dec_ip = self.dec_ip.lstrip("0")
+            elif len(self.dec_ip) == 0:
                 print("Please enter a passkey \n ")
                 self.passkey = input(" Re-enter your accesskey : ")
-                dec_ip = self.decode_key(self.passkey)
+                self.dec_ip = self.decode_key(self.passkey)
             else:
                 print("Please enter the correct passkey \n ")
                 self.passkey = input(" Re-enter your accesskey : ")
-                dec_ip = self.decode_key(self.passkey)
+                self.dec_ip = self.decode_key(self.passkey)
         except (
             ConnectionRefusedError,
             UnicodeDecodeError,
@@ -58,10 +59,9 @@ class clientType:
         ):
             print("Please enter the correct passkey \n ")
             self.passkey = input(" Re-enter your accesskey : ")
-            dec_ip = self.decode_key(self.passkey)
+            self.dec_ip = self.decode_key(self.passkey)
         finally:
-            return dec_ip
-
+            return self.dec_ip
 
     def receive(self):
         self.username
