@@ -97,8 +97,16 @@ class myclass2(Frame):
 
     def _enter(self):
 
-        # os.system(f"python server.py {self.data['username']}")
-        subprocess.call(f"python server.py {self.data['username']}", shell=True)
+        if platform == "linux" or platform == "linux2":
+            subprocess.call(
+                ["gnome-terminal", "-x", f'python server.py {self.data["username"]}']
+            )
+        if platform == "win32":
+            subprocess.call(
+                f"start /wait python server.py {self.data['username']}", shell=True
+            )
+        else:
+            os._exit(1)
         raise StopApplication("Exit this")
 
     def _quit(self):
@@ -110,7 +118,7 @@ class myclass2(Frame):
 
     @staticmethod
     def _quit_on_yes(selected):
-        # Yes is the first button
+
         if selected == 0:
             raise StopApplication("User requested exit")
 
@@ -143,11 +151,17 @@ class myclass3(Frame):
     def _view(self):
         global form_data
         self.save()
-        # message = "Passkey : {}".format(form_data["passkey"])
-        # self._scene.add_effect(PopUpDialog(self._screen, message, ["OK"]))
-        # os.system(f"python client.py {self.data['passkey']}")
-        subprocess.call(f"python client.py {self.data['passkey']}", shell=True)
 
+        if platform == "linux" or platform == "linux2":
+            subprocess.call(
+                ["gnome-terminal", "-x", f'python client.py {self.data["passkey"]}']
+            )
+        if platform == "win32":
+            subprocess.call(
+                f"start /wait python client.py {self.data['passkey']}", shell=True
+            )
+        else:
+            os._exit(1)
         raise StopApplication("Exit this")
 
     def _quit(self):
