@@ -70,11 +70,10 @@ class myclass2(Frame):
         )
         layout = Layout([1, 1, 1])
         self.add_layout(layout)
-        layout.add_widget(
-            Text(label="Username", name="username", on_change=self._on_change), 0
-        )
-        layout.add_widget(Button("Enter", self._enter), 1)
-        layout.add_widget(Button("Quit", self._quit), 2)
+        layout.add_widget(Text(label="Username", name="username", 0)
+        layout.add_widget(Button("OK", self._ok), 2)
+
+        layout.add_widget(Button("Quit", self._quit), 3)
         self.fix()
 
     def _on_change(self):
@@ -89,9 +88,7 @@ class myclass2(Frame):
         message = "Hi , {}".format(form_data["username"])
         self._scene.add_effect(PopUpDialog(self._screen, message, ["OK"]))
 
-    def _enter(self):
-        global form_data
-        os.system(f"python server.py {form_data['username']}")
+
 
     def _quit(self):
         self._scene.add_effect(
