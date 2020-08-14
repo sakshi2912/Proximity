@@ -15,6 +15,12 @@ from asciimatics.screen import Screen
 from asciimatics.exceptions import ResizeScreenError, NextScene, StopApplication
 import os
 
+import socket
+import threading
+import os
+import signal
+from sys import platform
+import base64
 
 form_data = {"username": "", "passkey": ""}
 
@@ -70,10 +76,11 @@ class myclass2(Frame):
         )
         layout = Layout([1, 1, 1])
         self.add_layout(layout)
-        layout.add_widget(Text(label="Username", name="username", 0)
-        layout.add_widget(Button("OK", self._ok), 2)
-
-        layout.add_widget(Button("Quit", self._quit), 3)
+        layout.add_widget(
+            Text(label="Username", name="username", on_change=self._on_change), 0
+        )
+        layout.add_widget(Button("Enter", self._enter), 1)
+        layout.add_widget(Button("Quit", self._quit), 2)
         self.fix()
 
     def _on_change(self):
@@ -88,7 +95,10 @@ class myclass2(Frame):
         message = "Hi , {}".format(form_data["username"])
         self._scene.add_effect(PopUpDialog(self._screen, message, ["OK"]))
 
+    def _enter(self):
 
+        os.system(f"python server.py {self.data['username']}")
+        raise StopApplication("Exit this")
 
     def _quit(self):
         self._scene.add_effect(
@@ -132,8 +142,10 @@ class myclass3(Frame):
     def _view(self):
         global form_data
         self.save()
-        message = "Passkey : {}".format(form_data["passkey"])
-        self._scene.add_effect(PopUpDialog(self._screen, message, ["OK"]))
+        # message = "Passkey : {}".format(form_data["passkey"])
+        # self._scene.add_effect(PopUpDialog(self._screen, message, ["OK"]))
+        os.system(f"python client.py {self.data['passkey']}")
+        raise StopApplication("Exit this")
 
     def _quit(self):
         self._scene.add_effect(

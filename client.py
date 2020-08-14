@@ -11,18 +11,18 @@ class clientType:
 
     PORT = 5050
     DISCONNECT_MESSAGE = "exit"
-    passkey = ''
-    IP = ''
-    username = ''
-    client = ''
+    passkey = ""
+    IP = ""
+    username = ""
+    client = ""
 
     def __init__(self):
         if platform == "linux" or platform == "linux2":
-            os.system('clear')
+            os.system("clear")
         elif platform == "win32":
-            os.system('cls')
+            os.system("cls")
         else:
-            print('Unsupported OS')
+            print("Unsupported OS")
             exit(1)
         self.passkey = sys.argv[1]
         self.IP = self.decode_key(self.passkey)
@@ -32,16 +32,16 @@ class clientType:
         self.username = input("Enter your username: ")
         while not self.username.isalpha():
             print(" \n \t ERROR: The username should only contain alphabates. \n")
-            self.username = input('Enter server name : ')
+            self.username = input("Enter server name : ")
 
     def decode_key(self, valu):
         try:
             decoded_data = base64.b64decode(valu)
-            dec_ip = decoded_data.decode('utf-8')
+            dec_ip = decoded_data.decode("utf-8")
             if len(dec_ip) == 8:
-                dec_ip = '192.168' + dec_ip.lstrip('0')
+                dec_ip = "192.168" + dec_ip.lstrip("0")
             elif len(dec_ip) == 15:
-                dec_ip = dec_ip.lstrip('0')
+                dec_ip = dec_ip.lstrip("0")
             elif len(dec_ip) == 0:
                 print("Please enter a passkey \n ")
                 self.passkey = input(" Re-enter your accesskey : ")
@@ -50,7 +50,12 @@ class clientType:
                 print("Please enter the correct passkey \n ")
                 self.passkey = input(" Re-enter your accesskey : ")
                 dec_ip = self.decode_key(self.passkey)
-        except (ConnectionRefusedError, UnicodeDecodeError, UnboundLocalError, base64.binascii.Error):
+        except (
+            ConnectionRefusedError,
+            UnicodeDecodeError,
+            UnboundLocalError,
+            base64.binascii.Error,
+        ):
             print("Please enter the correct passkey \n ")
             self.passkey = input(" Re-enter your accesskey : ")
             dec_ip = self.decode_key(self.passkey)
@@ -58,22 +63,22 @@ class clientType:
             return dec_ip
 
     def receive(self):
-        self. username
+        self.username
         while True:
             try:
-                message = self.client.recv(1024).decode('utf-8')
-                if message == 'Connect':
-                    self.client.send(self.username.encode('utf-8'))
-                elif message == 'Server left':
-                    print('\nServer has disconnected\n')
+                message = self.client.recv(1024).decode("utf-8")
+                if message == "Connect":
+                    self.client.send(self.username.encode("utf-8"))
+                elif message == "Server left":
+                    print("\nServer has disconnected\n")
                     os._exit(0)
-                elif 'Connected to' in message:
-                    print('\n \t ', message, '\n')
-                elif 'Username updated to [' in message:
+                elif "Connected to" in message:
+                    print("\n \t ", message, "\n")
+                elif "Username updated to [" in message:
                     print(message)
                     self.username = message[25:-1]
                 else:
-                    print('\t\t\t\t', message)
+                    print("\t\t\t\t", message)
             except:
                 print("An error occured!")
                 self.client.close()
@@ -84,25 +89,25 @@ class clientType:
             try:
                 input_val = input()
                 if input_val == self.DISCONNECT_MESSAGE:
-                    self.client.send(self.DISCONNECT_MESSAGE.encode('utf-8'))
+                    self.client.send(self.DISCONNECT_MESSAGE.encode("utf-8"))
                     self.client.close()
-                    print('You will be disconnected')
+                    print("You will be disconnected")
                     os._exit(0)
                 else:
-                    message = f'[{self.username}] : {input_val}'
-                    self.client.send(message.encode('utf-8'))
+                    message = f"[{self.username}] : {input_val}"
+                    self.client.send(message.encode("utf-8"))
             except:
-                print('\n \t Error Occoured while Reading input \n')
-                self.client.send(self.DISCONNECT_MESSAGE.encode('utf-8'))
+                print("\n \t Error Occoured while Reading input \n")
+                self.client.send(self.DISCONNECT_MESSAGE.encode("utf-8"))
                 self.client.close()
-                print('You will be disconnected')
+                print("You will be disconnected")
                 os._exit(0)
 
     def keyboardInterruptHandler(self, signal, frame):
-        print('Interrupted')
-        self.client.send(self.DISCONNECT_MESSAGE.encode('utf-8'))
+        print("Interrupted")
+        self.client.send(self.DISCONNECT_MESSAGE.encode("utf-8"))
         self.client.close()
-        print('You will be disconnected')
+        print("You will be disconnected")
         os._exit(0)
 
     def mainFunc(self):
