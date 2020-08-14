@@ -37,15 +37,13 @@ class serverType:
         print('Creating server')
         self.server_name = input('Enter server name : ')
         while not self.server_name.isalpha():
-            print(
-                " \n \t ERROR: The Server name should only contain a set of alphabates. \n")
+            print(" \n \t ERROR: The Server name should only contain a set of alphabates. \n")
             self.server_name = input('Enter server name : ')
         self.clients_dict['Server'] = self.server_name
 
     def encodefunc(self, val):
         encoded_data = base64.b64encode(bytes(val, 'utf-8'))
-        print(
-            f"\n\n-------- {self.server_name}'s Chat-Room accesskey : ( {encoded_data.decode('utf-8')} ) --------")
+        print(f"\n\n-------- {self.server_name}'s Chat-Room accesskey : ( {encoded_data.decode('utf-8')} ) --------")
 
     def getpasskey(self, str1):
         if str1[0:7] == '192.168':
@@ -71,21 +69,17 @@ class serverType:
                     print(f'\n \t [{user}] disconnected \n')
                     del self.clients_dict[client]
                     client.close()
-                    self.broadcast(
-                        f'\n \t [{user}] left! \n'.encode('utf-8'), client)
+                    self.broadcast(f'\n \t [{user}] left! \n'.encode('utf-8'), client)
                     break
-
                 else:
                     print('\t\t\t\t', message)
                     self.broadcast(message.encode('utf-8'), client)
-
             except:
                 user = self.clients_dict[client]
                 print(f'\n \t [{user}] disconnected \n')
                 client.close()
                 del self.clients_dict[client]
-                self.broadcast(
-                    f'\n \t [{user}] left! \n'.encode('utf-8'), client)
+                self.broadcast(f'\n \t [{user}] left! \n'.encode('utf-8'), client)
                 break
 
     def send_message(self):
@@ -97,7 +91,6 @@ class serverType:
                     self.broadcast('Server left'.encode('utf-8'), 'Server')
                     os._exit(0)
                 self.broadcast(b_message.encode('utf-8'), 'Server')
-
             except:
                 print('\n \t Error Occoured while Reading input \n')
                 self.broadcast('Server left'.encode('utf-8'), 'Server')
@@ -105,9 +98,7 @@ class serverType:
 
     def accept_conn(self):
         while True:
-
             client, address = self.server.accept()
-
             client.send('Connect'.encode('utf-8'))
             client_name = client.recv(1024).decode('utf-8')
             final_client_name = client_name
@@ -115,17 +106,14 @@ class serverType:
             while final_client_name in self.clients_dict.values():
                 final_client_name = f"{client_name}{i}"
                 i += 1
-
             if client_name != final_client_name:
-                message = (
-                    '\n \t Username updated to ['+final_client_name+']').encode('utf-8')
+                message = ('\n \t Username updated to ['+final_client_name+']').encode('utf-8')
                 client.send(message)
             self.clients_dict[client] = final_client_name
             print(f"\n \t [{self.clients_dict[client]}] joined the server \n")
             self.broadcast(f"\n \t [{self.clients_dict[client]}] joined! \n".encode(
                 'utf-8'), client)
             client.send(f"Connected to [{self.server_name}]!".encode('utf-8'))
-
             thread = threading.Thread(target=self.rec_message, args=(client,))
             thread.start()
             print('Active threads : ' + str(threading.active_count()-1))
