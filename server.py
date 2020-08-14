@@ -50,6 +50,7 @@ class serverType:
             f"\n\n-------- {self.server_name}'s Chat-Room accesskey : ( {encoded_data.decode('utf-8')} ) --------"
         )
 
+
     def getpasskey(self, str1):
         if str1[0:7] == "192.168":
             self.encodefunc(str1[7:].zfill(8))
@@ -149,3 +150,4 @@ class serverType:
 
 
 s1 = serverType()
+
