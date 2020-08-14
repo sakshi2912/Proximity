@@ -98,9 +98,8 @@ class myclass2(Frame):
     def _enter(self):
 
         if platform == "linux" or platform == "linux2":
-            subprocess.call(
-                ["gnome-terminal", "-x", f'python server.py {self.data["username"]}']
-            )
+            os.system(f'gnome-terminal -x python3 {os.getcwd()}/server.py {self.data["username"]}')
+
         if platform == "win32":
             subprocess.call(
                 f"start /wait python server.py {self.data['username']}", shell=True
@@ -153,9 +152,8 @@ class myclass3(Frame):
         self.save()
 
         if platform == "linux" or platform == "linux2":
-            subprocess.call(
-                ["gnome-terminal", "-x", f'python client.py {self.data["passkey"]}']
-            )
+            os.system(f'gnome-terminal -x python3 {os.getcwd()}/client.py {self.data["passkey"]}')
+
         if platform == "win32":
             subprocess.call(
                 f"start /wait python client.py {self.data['passkey']}", shell=True
