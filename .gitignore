@@ -1,3 +1,5 @@
 TODO
 VMfolder
 *vms.sh
+__pycache__
+*vscode
