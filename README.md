@@ -28,3 +28,4 @@ This repository contains a simple implementation of an offline chatroom.
 - One server can host only one chat-room at a time.
 - When the server disconnects, all the participants wil be forced to exit.
 - Type 'exit' to leave the chat-room.
+- Needs a User Interface
