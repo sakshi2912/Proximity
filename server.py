@@ -16,7 +16,7 @@ class serverType:
     server = ''
 
     def __init__(self):
-        if platform == "linux" or platform == "linux2":
+        if platform == "linux" or platform == "linux2" or platform == "darwin":
             os.system('clear')
             if (os.path.exists('ip.txt')):
                 os.remove('ip.txt')
