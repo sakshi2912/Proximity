@@ -21,7 +21,7 @@ This repository contains a simple implementation of an offline chatroom.
 
 ## Features/Bugs:
 
-- Works on Windows and Linux.
+- Works on Windows, Linux and Mac OS
 - Can support group chats.
 - Anyone in the same network can start/join chatroom.
 - A client can exit and re-connect to a chat-room multiple times.
