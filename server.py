@@ -18,13 +18,14 @@ class serverType:
     def __init__(self):
         if platform == "linux" or platform == "linux2" or platform == "darwin":
             os.system('clear')
-            if (os.path.exists('ip.txt')):
-                os.remove('ip.txt')
-            os.system("ifconfig | grep 192 | awk -F ' ' '{print $2}' > ip.txt")
-            f = open('ip.txt', 'r')
-            line = f.readline()
-            os.remove('ip.txt')
-            self.IP = line.strip()
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            try:
+                s.connect(("10.255.255.255", 1))
+                self.IP = s.getsockname()[0]
+            except:
+                self.IP = '127.0.0.1'
+            finally:
+                s.close()
         elif platform == "win32":
             os.system('cls')
             self.IP = socket.gethostbyname(socket.gethostname())
