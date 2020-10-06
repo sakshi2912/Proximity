@@ -2,6 +2,8 @@ import socket
 import threading
 import os
 import signal
+import fcntl
+import struct
 from sys import platform
 import base64
 
@@ -17,15 +19,23 @@ class serverType:
 
     def __init__(self):
         if platform == "linux" or platform == "linux2" or platform == "darwin":
-            os.system('clear')
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            try:
-                s.connect(("10.255.255.255", 1))
-                self.IP = s.getsockname()[0]
-            except:
-                self.IP = '127.0.0.1'
-            finally:
+            # Set default IP
+            self.IP = "127.0.0.1"
+            # Get list of interfaces
+            for interface in socket.if_nameindex():
+                interfaceName = interface[1]
+                # Get IP for socket
+                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                interfaceIP = socket.inet_ntoa(fcntl.ioctl( 
+                    s.fileno(),
+                    0x8915,  # SIOCGIFADDR
+                    struct.pack('256s', interfaceName[:15].encode("UTF-8"))
+                )[20:24])
                 s.close()
+                # Check ipv4
+                if interfaceIP.startswith("192."):
+                    self.IP = interfaceIP
+                    break
         elif platform == "win32":
             os.system('cls')
             self.IP = socket.gethostbyname(socket.gethostname())
