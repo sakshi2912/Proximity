@@ -19,7 +19,9 @@ class serverType:
     def __init__(self):
         if platform == "linux" or platform == "linux2" or platform == "darwin":
             os.system('clear')
-            IPs = subprocess.check_output("hostname -I", shell=True).decode('utf-8').split()
+            cmd = "ip -4 addr | grep -oP '(?<=inet\\s)\\d+(\\.\\d+){3}'"
+            IPoutput = subprocess.check_output(cmd, shell=True).decode('utf-8').strip()
+            IPs = IPoutput.split("\n")
             if len(IPs) == 1:
                 self.IP = IPs[0]
             else:
