@@ -1,4 +1,5 @@
 import socket
+import subprocess
 import threading
 import os
 import signal
@@ -18,13 +19,7 @@ class serverType:
     def __init__(self):
         if platform == "linux" or platform == "linux2" or platform == "darwin":
             os.system('clear')
-            if (os.path.exists('ip.txt')):
-                os.remove('ip.txt')
-            os.system("ifconfig | grep 192 | awk -F ' ' '{print $2}' > ip.txt")
-            f = open('ip.txt', 'r')
-            line = f.readline()
-            os.remove('ip.txt')
-            self.IP = line.strip()
+            self.IP = subprocess.check_output("hostname -I", shell=True).decode('utf-8').split()[0]
         elif platform == "win32":
             os.system('cls')
             self.IP = socket.gethostbyname(socket.gethostname())
