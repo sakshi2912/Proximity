@@ -17,9 +17,35 @@ class serverType:
     server = ''
 
     def __init__(self):
-        if platform == "linux" or platform == "linux2" or platform == "darwin":
+        if platform == "linux" or platform == "linux2":
             os.system('clear')
             cmd = "ip -4 addr | grep -oP '(?<=inet\\s)\\d+(\\.\\d+){3}'"
+            IPoutput = subprocess.check_output(cmd, shell=True).decode('utf-8').strip()
+            IPs = IPoutput.split("\n")
+            if len(IPs) == 1:
+                self.IP = IPs[0]
+            else:
+                print("Select IP to use for server 0 to", len(IPs)-1)
+                for i in range(len(IPs)):
+                    print("[{}] {}".format(i, IPs[i]))
+                choice = input()
+
+                try:
+                    choice = int(choice)
+                    if choice < 0 or choice > len(IPs)-1:
+                        print("Invalid choice, defaulting to", IPs[0])
+                        self.IP = IPs[0]
+                    else:
+                        self.IP = IPs[choice]
+                except:
+                    print("Invalid choice, defaulting to", IPs[0])
+                    self.IP = IPs[0]
+
+            print("Server will be running at", self.IP)
+
+        elif platform == "darwin":
+            os.system("clear")
+            cmd = "ifconfig | grep -oE \"\\binet ([0-9]{1,3}\\.){3}[0-9]{1,3}\\b\" | awk '{print $2}'"
             IPoutput = subprocess.check_output(cmd, shell=True).decode('utf-8').strip()
             IPs = IPoutput.split("\n")
             if len(IPs) == 1:
