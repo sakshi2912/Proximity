@@ -27,7 +27,7 @@ This repository contains a simple implementation of an offline chatroom.
 - Can support group chats.
 - Anyone in the same network can start/join chatroom.
 - A client can exit and re-connect to a chat-room multiple times.
-- One server can host only one chat-room at a time.
+- A server can host multiple chatrooms, but only one chat-room per network interface.
 - When the server disconnects, all the participants wil be forced to exit.
 - Type 'exit' to leave the chat-room.
-- Needs a User Interface
+- Needs an User Interface (Refer v2 branch to checkout the previous work done on Terminal UI)
