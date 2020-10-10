@@ -19,19 +19,19 @@ class serverType:
     def __init__(self):
         if platform == "linux" or platform == "linux2":
             os.system('clear')
-            cmd = "ip -4 addr | grep -oP '(?<=inet\\s)\\d+(\\.\\d+){3}'"
+            cmd = "ip addr | grep -oP '(?<=inet\\s)\\d+(\\.\\d+){3}'"
             IPoutput = subprocess.check_output(cmd, shell=True).decode('utf-8').strip()
             IPs = IPoutput.split("\n")
             if len(IPs) == 1:
                 self.IP = IPs[0]
             else:
-                print("Select IP to use for server 0 to", len(IPs)-1)
+                print("List of IPs to use for server:")
                 for i in range(len(IPs)):
-                    print("[{}] {}".format(i, IPs[i]))
-                choice = input()
+                    print("[{}] {}".format(i+1, IPs[i]))
+                choice = input("\nChoose an option [{} - {}]: ".format(1,len(IPs)))
 
                 try:
-                    choice = int(choice)
+                    choice = int(choice)-1
                     if choice < 0 or choice > len(IPs)-1:
                         print("Invalid choice, defaulting to", IPs[0])
                         self.IP = IPs[0]
@@ -78,8 +78,7 @@ class serverType:
         self.mainFunc()
 
     def getName(self):
-        print('Creating server')
-        self.server_name = input('Enter server name : ')
+        self.server_name = input("\nEnter server name : ")
         while not self.server_name.isalpha():
             print(" \n \t ERROR: The Server name should only contain a set of alphabates. \n")
             self.server_name = input('Enter server name : ')
@@ -175,7 +174,7 @@ class serverType:
         signal.signal(signal.SIGINT, self.keyboardInterruptHandler)
         thread2 = threading.Thread(target=self.send_message)
         thread2.start()
-        print('Created server')
+        print("{Server created Successfully!}\n")
         self.accept_conn()
 
 
