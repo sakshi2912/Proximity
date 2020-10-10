@@ -13,6 +13,8 @@ This repository contains a simple implementation of an offline chatroom.
   
     ``` python3 server.py ```
 
+    Choose an IP address in the list of IP adresses presented, to start the server in the respective network.
+
     If the web socket is not occupied, the chat server is started and a passkey is generated, for the chat room it is hosting. ( This passkey is to be shared with the participants joining the chat. ) 
 
 - To start a client and connect to a chat room

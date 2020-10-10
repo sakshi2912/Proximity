@@ -19,7 +19,7 @@ class serverType:
     def __init__(self):
         if platform == "linux" or platform == "linux2":
             os.system('clear')
-            cmd = "ip addr | grep -oP '(?<=inet\\s)\\d+(\\.\\d+){3}'"
+            cmd = "ip -4 addr | grep -oP '(?<=inet\\s)\\d+(\\.\\d+){3}'"
             IPoutput = subprocess.check_output(cmd, shell=True).decode('utf-8').strip()
             IPs = IPoutput.split("\n")
             if len(IPs) == 1:
