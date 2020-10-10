@@ -89,7 +89,7 @@ class clientType:
                     print('You will be disconnected')
                     os._exit(0)
                 else:
-                    message = f'[{self.username}] : {input_val}'
+                    message = '[{}] : {}'.format(self.username, input_val)
                     self.client.send(message.encode('utf-8'))
             except:
                 print('\n \t Error Occoured while Reading input \n')
