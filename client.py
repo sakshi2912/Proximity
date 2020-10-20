@@ -58,7 +58,7 @@ class clientType:
             return dec_ip
 
     def receive(self):
-        self. username
+        #self. username
         while True:
             try:
                 message = self.client.recv(1024).decode('utf-8')

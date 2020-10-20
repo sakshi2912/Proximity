@@ -158,7 +158,7 @@ class serverType:
             client.send("Connected to [{}]!".format(self.server_name).encode('utf-8'))
             thread = threading.Thread(target=self.rec_message, args=(client,))
             thread.start()
-            print('Active threads : ' + str(threading.active_count()-1))
+            #print('Active threads : ' + str(threading.active_count()-1))
 
     def keyboardInterruptHandler(self, signal, frame):
         print('Interrupted')
@@ -174,7 +174,7 @@ class serverType:
         signal.signal(signal.SIGINT, self.keyboardInterruptHandler)
         thread2 = threading.Thread(target=self.send_message)
         thread2.start()
-        print("{Server created Successfully!}\n")
+        print("Server created Successfully!\n")
         self.accept_conn()
 
 
