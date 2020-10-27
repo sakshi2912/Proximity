@@ -67,6 +67,18 @@ class clientType:
                 elif message == 'Server left':
                     print('\nServer has disconnected\n')
                     os._exit(0)
+                elif message.startswith("image: "):
+                    fname,size = message[7:].split()
+                    fpath='Proximity_images'
+                    if not os.path.exists(fpath):
+                        os.makedirs(fpath)
+                    pwd=os.getcwd()
+                    os.chdir(fpath)
+                    with open(fname,"wb") as f:
+                        chunk = self.client.recv(int(size))
+                        f.write(chunk)
+                    os.chdir(pwd)
+                    print('Received Image file successfully')
                 elif 'Connected to' in message:
                     print('\n \t ', message, '\n')
                 elif 'Username updated to [' in message:
@@ -88,6 +100,16 @@ class clientType:
                     self.client.close()
                     print('You will be disconnected')
                     os._exit(0)
+                elif input_val.startswith("image: "):
+                    fname = input_val.split()[1]
+                    fsize = os.path.getsize(fname)
+                    iname=os.path.basename(fname)
+                    message='image: '+iname+' '+str(fsize)
+                    self.client.send(message.encode('utf-8'))
+                    with open(fname,"rb") as f:
+                        chunks = f.read(fsize)
+                        self.client.send(chunks)
+                    print('Sent Image successfully')
                 else:
                     message = '[{}] : {}'.format(self.username, input_val)
                     self.client.send(message.encode('utf-8'))

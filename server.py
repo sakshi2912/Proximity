@@ -4,6 +4,7 @@ import threading
 import os
 import signal
 from sys import platform
+import sys
 import base64
 
 
@@ -114,6 +115,18 @@ class serverType:
                     client.close()
                     self.broadcast('\n \t [{}] left! \n'.format(user).encode('utf-8'), client)
                     break
+                elif message.startswith('image: '):
+                    fname,size = message[7:].split()
+                    fpath='Proximity_images'
+                    if not os.path.exists(fpath):
+                        os.makedirs(fpath)
+                    pwd=os.getcwd()
+                    os.chdir(fpath)
+                    with open(fname,"wb") as f:
+                        chunk = client.recv(int(size))
+                        f.write(chunk)
+                    os.chdir(pwd)
+                    print('Received Image successfully')
                 else:
                     print('\t\t\t\t', message)
                     self.broadcast(message.encode('utf-8'), client)
@@ -133,7 +146,18 @@ class serverType:
                 if message == self.DISCONNECT_MESSAGE:
                     self.broadcast('Server left'.encode('utf-8'), 'Server')
                     os._exit(0)
-                self.broadcast(b_message.encode('utf-8'), 'Server')
+                elif message.startswith('image: '):
+                    fname = message[7:]
+                    fsize = os.path.getsize(fname)
+                    iname=os.path.basename(fname)
+                    message='image: '+iname+' '+str(fsize)
+                    self.broadcast(message.encode('utf-8'),'Server')
+                    with open(fname,"rb") as f:
+                        chunks = f.read(fsize)
+                        self.broadcast(chunks,'Server')
+                    print('Sent Image successfully')
+                else:
+                    self.broadcast(b_message.encode('utf-8'), 'Server')
             except:
                 print('\n \t Error Occoured while Reading input \n')
                 self.broadcast('Server left'.encode('utf-8'), 'Server')
