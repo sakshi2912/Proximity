@@ -6,7 +6,6 @@ from sys import platform
 import sys
 import base64
 
-
 class clientType:
 
     PORT = 5050
@@ -72,6 +71,15 @@ class clientType:
                 elif 'Username updated to [' in message:
                     print(message)
                     self.username = message[25:-1]
+                elif message.startswith("file:"):
+                    filename, filesize = message[5:].split(";")
+                    # remove absolute path if there is
+                    filename = os.path.basename(filename)
+                    # convert to integer
+                    filesize = int(filesize)
+                    with open(filename, "wb") as f:
+                        bytes_read = self.client.recv(filesize)
+                        f.write(bytes_read)
                 else:
                     print('\t\t\t\t', message)
             except:
@@ -88,7 +96,18 @@ class clientType:
                     self.client.close()
                     print('You will be disconnected')
                     os._exit(0)
-                else:
+                elif input_val.startswith("file:"):
+                    filename=input_val[5:]
+                    filesize=os.path.getsize(filename)
+                    message = input_val+";"+str(filesize)
+                    self.client.send(message.encode('utf-8'))
+                    with open(filename, "rb") as f:
+                        
+                        bytes_read = f.read(filesize)
+                        self.client.send(bytes_read)
+                        
+                    print("File sent")
+                else:   
                     message = '[{}] : {}'.format(self.username, input_val)
                     self.client.send(message.encode('utf-8'))
             except:
