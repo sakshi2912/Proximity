@@ -115,30 +115,31 @@ class serverType:
                     client.close()
                     self.broadcast('\n \t [{}] left! \n'.format(user).encode('utf-8'), client)
                     break
-                elif message.startswith('image: '):
+                elif message.startswith('image:'):
                     fname,fsize = message[7:].split()
                     fpath='Proximity_images'
                     if not os.path.exists(fpath):
-                        os.makedirs(fpath)
-                    pwd=os.getcwd()
-                    os.chdir(fpath)
+                        os.mkdir(fpath)
                     fsize = int(fsize)
                     c=0
                     k=(fsize//512)*512
-                    with open(fname,"wb") as f:
-                        while True:
-                            chunk=client.recv(512)
-                            if not chunk:
-                                break
-                            f.write(chunk)
-                            c+=512
-                            if c==k:
-                                break
-                        if fsize-k:
-                            chunk=client.recv(fsize-k+1)
-                            f.write(chunk) 
-                    os.chdir(pwd)
-                    print('Received Image successfully')
+                    fname1 = fpath+'/'+fname
+                    try:
+                        with open(fname1,"wb") as f:
+                            while True:
+                                chunk=client.recv(512)
+                                if not chunk:
+                                    break
+                                f.write(chunk)
+                                c+=512
+                                if c==k:
+                                    break
+                            if fsize-k:
+                                chunk=client.recv(fsize-k+1)
+                                f.write(chunk)
+                        print('Received Image successfully')
+                    except:
+                        print("An error occured!)
                 else:
                     print('\t\t\t\t', message)
                     self.broadcast(message.encode('utf-8'), client)
@@ -158,7 +159,7 @@ class serverType:
                 if message == self.DISCONNECT_MESSAGE:
                     self.broadcast('Server left'.encode('utf-8'), 'Server')
                     os._exit(0)
-                elif message.startswith('image: '):
+                elif message.startswith('image:'):
                     fname = message[7:]
                     fsize = os.path.getsize(fname)
                     iname=os.path.basename(fname)
@@ -166,19 +167,22 @@ class serverType:
                     self.broadcast(message.encode('utf-8'),'Server')
                     k=(fsize//512)*512
                     c=0
-                    with open(fname,"rb") as f:
-                        while True:
-                            chunks = f.read(512)
-                            if not chunks:
-                                break
-                            c+=512
-                            self.broadcast(chunks,'Server')
-                            if c==k:
-                                break
-                        if fsize-k:
-                            chunks=f.read(fsize-k+1)
-                            self.broadcast(chunks,'Server')
-                    print('Sent Image successfully')
+                    try:
+                        with open(fname,"rb") as f:
+                            while True:
+                                chunks = f.read(512)
+                                if not chunks:
+                                    break
+                                c+=512
+                                self.broadcast(chunks,'Server')
+                                if c==k:
+                                    break
+                            if fsize-k:
+                                chunks=f.read(fsize-k+1)
+                                self.broadcast(chunks,'Server')
+                        print('Sent Image successfully')
+                   except:
+                        print("An error occured!")
                 else:
                     self.broadcast(b_message.encode('utf-8'), 'Server')
             except:
