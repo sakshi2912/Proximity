@@ -116,15 +116,27 @@ class serverType:
                     self.broadcast('\n \t [{}] left! \n'.format(user).encode('utf-8'), client)
                     break
                 elif message.startswith('image: '):
-                    fname,size = message[7:].split()
+                    fname,fsize = message[7:].split()
                     fpath='Proximity_images'
                     if not os.path.exists(fpath):
                         os.makedirs(fpath)
                     pwd=os.getcwd()
                     os.chdir(fpath)
+                    fsize = int(fsize)
+                    c=0
+                    k=(fsize//512)*512
                     with open(fname,"wb") as f:
-                        chunk = client.recv(int(size))
-                        f.write(chunk)
+                        while True:
+                            chunk=client.recv(512)
+                            if not chunk:
+                                break
+                            f.write(chunk)
+                            c+=512
+                            if c==k:
+                                break
+                        if fsize-k:
+                            chunk=client.recv(fsize-k+1)
+                            f.write(chunk) 
                     os.chdir(pwd)
                     print('Received Image successfully')
                 else:
@@ -152,9 +164,20 @@ class serverType:
                     iname=os.path.basename(fname)
                     message='image: '+iname+' '+str(fsize)
                     self.broadcast(message.encode('utf-8'),'Server')
+                    k=(fsize//512)*512
+                    c=0
                     with open(fname,"rb") as f:
-                        chunks = f.read(fsize)
-                        self.broadcast(chunks,'Server')
+                        while True:
+                            chunks = f.read(512)
+                            if not chunks:
+                                break
+                            c+=512
+                            self.broadcast(chunks,'Server')
+                            if c==k:
+                                break
+                        if fsize-k:
+                            chunks=f.read(fsize-k+1)
+                            self.broadcast(chunks,'Server')
                     print('Sent Image successfully')
                 else:
                     self.broadcast(b_message.encode('utf-8'), 'Server')

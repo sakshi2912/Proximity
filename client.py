@@ -68,17 +68,29 @@ class clientType:
                     print('\nServer has disconnected\n')
                     os._exit(0)
                 elif message.startswith("image: "):
-                    fname,size = message[7:].split()
+                    fname,fsize = message[7:].split()
                     fpath='Proximity_images'
                     if not os.path.exists(fpath):
                         os.makedirs(fpath)
                     pwd=os.getcwd()
                     os.chdir(fpath)
+                    fsize = int(fsize)
+                    c=0
+                    k=(fsize//512)*512
                     with open(fname,"wb") as f:
-                        chunk = self.client.recv(int(size))
-                        f.write(chunk)
+                        while True:
+                            chunk=self.client.recv(512)
+                            if not chunk:
+                                break
+                            f.write(chunk)
+                            c+=512
+                            if c==k:
+                                break
+                        if fsize-k:
+                            chunk=self.client.recv(fsize-k+1)
+                            f.write(chunk) 
                     os.chdir(pwd)
-                    print('Received Image file successfully')
+                    print('Received Image successfully')
                 elif 'Connected to' in message:
                     print('\n \t ', message, '\n')
                 elif 'Username updated to [' in message:
@@ -106,9 +118,20 @@ class clientType:
                     iname=os.path.basename(fname)
                     message='image: '+iname+' '+str(fsize)
                     self.client.send(message.encode('utf-8'))
+                    k=(fsize//512)*512
+                    c=0
                     with open(fname,"rb") as f:
-                        chunks = f.read(fsize)
-                        self.client.send(chunks)
+                        while True:
+                            chunks = f.read(512)
+                            if not chunks:
+                                break
+                            c+=512
+                            self.client.send(chunks)
+                            if c==k:
+                                break
+                        if fsize-k:
+                            chunks=f.read(fsize-k+1)
+                            self.client.send(chunks)
                     print('Sent Image successfully')
                 else:
                     message = '[{}] : {}'.format(self.username, input_val)
