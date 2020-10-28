@@ -119,10 +119,12 @@ class serverType:
                     filename = os.path.basename(filename)
                     # convert to integer
                     filesize = int(filesize)
-                    with open(("Proximity_files/Server/"+filename), "wb") as f:
+                    os.mkdir('Proximity_files')
+                    filename = os.path.join('Proximity_files', filename)
+                    with open(filename, "wb") as f:
                         bytes_read = client.recv(filesize)
                         f.write(bytes_read)
-
+                    print(f"File {filename} received ")
                 else:
                     print('\t\t\t\t', message)
                     self.broadcast(message.encode('utf-8'), client)
@@ -133,6 +135,7 @@ class serverType:
                 del self.clients_dict[client]
                 self.broadcast('\n \t [{}] left! \n'.format(user).encode('utf-8'), client)
                 break
+
 
 
     def send_message(self):
