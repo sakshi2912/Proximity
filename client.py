@@ -77,7 +77,8 @@ class clientType:
                     filename = os.path.basename(filename)
                     # convert to integer
                     filesize = int(filesize)
-                    os.mkdir('Proximity_files')
+                    if not os.path.exists('Proximity_files'):
+                        os.mkdir('Proximity_files')
                     filename = os.path.join('Proximity_files', filename)
                     with open(filename, "wb") as f:
                         bytes_read = self.client.recv(filesize)
