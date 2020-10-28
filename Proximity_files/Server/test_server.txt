@@ -1,3 +1,0 @@
-This is a test file
-Server sends this file
-to the Client
