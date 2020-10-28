@@ -21,12 +21,12 @@ This repository contains a simple implementation of an offline chatroom.
   
     ``` python3 client.py < chatroom's passkey > ```
 
-- To send a file from client to server and vice-versa 
-    ``` file:path_to_file ```
+- To send a file from client to server and vice-versa  <br>
+    ``` file:path_to_file ``` <br>
    Files are stored in the folder: Proximity_files
    
-- To send an image from client to server and vice-versa 
-    ``` image:path_to_image ```
+- To send an image from client to server and vice-versa <br>
+    ``` image:path_to_image ```<br>
    Images are stored in the folder: Proximity_images
 
 ## Features/Bugs:
@@ -34,7 +34,7 @@ This repository contains a simple implementation of an offline chatroom.
 - Works on Windows, Linux and Mac OS
 - Can support group chats.
 - Can support media transfer between client and server.<br>
-    a. Files (.txt,.py , .pdf etc.) are stored in Proximity_files
+    a. Files (.txt,.py , .pdf etc.) are stored in Proximity_files <br>
     b. Images (.png, .jpg etc. ) are stored in Proximity_images
 - Anyone in the same network can start/join chatroom.
 - A client can exit and re-connect to a chat-room multiple times.
