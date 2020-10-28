@@ -4,6 +4,7 @@ import threading
 import os
 import signal
 from sys import platform
+import sys
 import base64
 
 class serverType:
@@ -113,6 +114,33 @@ class serverType:
                     client.close()
                     self.broadcast('\n \t [{}] left! \n'.format(user).encode('utf-8'), client)
                     break
+
+                elif message.startswith('image:'):
+                    fname,fsize = message[7:].split()
+                    fpath='Proximity_images'
+                    if not os.path.exists(fpath):
+                        os.mkdir(fpath)
+                    fsize = int(fsize)
+                    c=0
+                    k=(fsize//512)*512
+                    fname1 = fpath+'/'+fname
+                    try:
+                        with open(fname1,"wb") as f:
+                            while True:
+                                chunk=client.recv(512)
+                                if not chunk:
+                                    break
+                                f.write(chunk)
+                                c+=512
+                                if c==k:
+                                    break
+                            if fsize-k:
+                                chunk=client.recv(fsize-k+1)
+                                f.write(chunk)
+                        print('Received Image successfully')
+                    except:
+                        print("An error occured!)
+
                 elif message.startswith("file:"):
                     filename, filesize = message[5:].split(";")
                     # remove absolute path if there is
@@ -126,6 +154,7 @@ class serverType:
                         bytes_read = client.recv(filesize)
                         f.write(bytes_read)
                     print(f"File {filename} received ")
+
                 else:
                     print('\t\t\t\t', message)
                     self.broadcast(message.encode('utf-8'), client)
@@ -147,6 +176,32 @@ class serverType:
                 if message == self.DISCONNECT_MESSAGE:
                     self.broadcast('Server left'.encode('utf-8'), 'Server')
                     os._exit(0)
+                              
+                elif message.startswith('image:'):
+                    fname = message[7:]
+                    fsize = os.path.getsize(fname)
+                    iname=os.path.basename(fname)
+                    message='image: '+iname+' '+str(fsize)
+                    self.broadcast(message.encode('utf-8'),'Server')
+                    k=(fsize//512)*512
+                    c=0
+                    try:
+                        with open(fname,"rb") as f:
+                            while True:
+                                chunks = f.read(512)
+                                if not chunks:
+                                    break
+                                c+=512
+                                self.broadcast(chunks,'Server')
+                                if c==k:
+                                    break
+                            if fsize-k:
+                                chunks=f.read(fsize-k+1)
+                                self.broadcast(chunks,'Server')
+                        print('Sent Image successfully')
+                   except:
+                        print("An error occured!")
+
                 elif message.startswith("file:"):
                     filename=message[5:]
                     filesize=os.path.getsize("Proximity_files/Server/"+filename)
@@ -158,6 +213,7 @@ class serverType:
                         self.broadcast(bytes_read, 'Server')
                         
                     print("File sent")
+
                 else:
                     self.broadcast(b_message.encode('utf-8'), 'Server')
             except:

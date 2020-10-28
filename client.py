@@ -66,6 +66,33 @@ class clientType:
                 elif message == 'Server left':
                     print('\nServer has disconnected\n')
                     os._exit(0)
+                elif message.startswith("image:"):
+                    fname,fsize = message[7:].split()
+                    fpath='Proximity_images'
+                    if not os.path.exists(fpath):
+                        os.mkdir(fpath)
+                    
+                    fsize = int(fsize)
+                    c=0
+                    k=(fsize//512)*512
+                    fname1 = fpath+'/'+fname
+                    try:
+                        with open(fname1,"wb") as f:
+                            while True:
+                                chunk=self.client.recv(512)
+                                if not chunk:
+                                    break
+                                f.write(chunk)
+                                c+=512
+                                if c==k:
+                                    break
+                            if fsize-k:
+                                chunk=self.client.recv(fsize-k+1)
+                                f.write(chunk)
+
+                        print(f"[{self.username} : Sent {fname}]")
+                   except:
+                    print("An error occured!")
                 elif 'Connected to' in message:
                     print('\n \t ', message, '\n')
                 elif 'Username updated to [' in message:
@@ -99,6 +126,32 @@ class clientType:
                     self.client.close()
                     print('You will be disconnected')
                     os._exit(0)
+
+                elif input_val.startswith("image:"):
+                    fname = input_val.split()[1]
+                    fsize = os.path.getsize(fname)
+                    iname=os.path.basename(fname)
+                    message='image: '+iname+' '+str(fsize)
+                    self.client.send(message.encode('utf-8'))
+                    k=(fsize//512)*512
+                    c=0
+                    try:
+                        with open(fname,"rb") as f:
+                            while True:
+                                chunks = f.read(512)
+                                if not chunks:
+                                    break
+                                c+=512
+                                self.client.send(chunks)
+                                if c==k:
+                                    break
+                            if fsize-k:
+                                chunks=f.read(fsize-k+1)
+                                self.client.send(chunks)
+                        print(f'Sent {fname} successfully')
+                    except:
+                        print("An error occured!")
+
                 elif input_val.startswith("file:"):
                     filename=input_val[5:]
                     filesize=os.path.getsize("Proximity_files/Client/"+filename)
