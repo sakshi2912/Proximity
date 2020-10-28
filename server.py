@@ -139,21 +139,25 @@ class serverType:
                                 f.write(chunk)
                         print('Received Image successfully')
                     except:
-                        print("An error occured!)
+                        print("An error occured!")
 
                 elif message.startswith("file:"):
-                    filename, filesize = message[5:].split(";")
-                    # remove absolute path if there is
-                    filename = os.path.basename(filename)
-                    # convert to integer
-                    filesize = int(filesize)
+                    fname, fsize = message[5:].split(";")
+                    fname = os.path.basename(fname)
+                    fsize = int(fsize)
+
                     if not os.path.exists('Proximity_files'):
                         os.mkdir('Proximity_files')
-                    filename = os.path.join('Proximity_files', filename)
-                    with open(filename, "wb") as f:
-                        bytes_read = client.recv(filesize)
-                        f.write(bytes_read)
-                    print(f"File {filename} received ")
+
+                    fname1 = 'Proximity_files/' + fname
+                    try:
+                        with open(fname1, "wb") as f:
+                            bytes_read = client.recv(fsize)
+                            f.write(bytes_read)
+                        print(f"File {fname} received ")
+                    
+                    except:
+                        print("An error occured!")
 
                 else:
                     print('\t\t\t\t', message)
@@ -199,20 +203,26 @@ class serverType:
                                 chunks=f.read(fsize-k+1)
                                 self.broadcast(chunks,'Server')
                         print('Sent Image successfully')
-                   except:
+                    except:
                         print("An error occured!")
 
                 elif message.startswith("file:"):
-                    filename=message[5:]
-                    filesize=os.path.getsize("Proximity_files/Server/"+filename)
-                    message = message+";"+str(filesize)
-                    self.broadcast(message.encode('utf-8'),'Server')
-                    with open(("Proximity_files/Server/"+filename), "rb") as f:
+                    fname=message[5:]
+                    fsize=os.path.getsize(fname)
+                    message = message+";"+str(fsize)
+                    
+                    self.broadcast(message.encode('utf-8'), 'Server')
+                    
+                    try:
+                        with open(fname, "rb") as f:
+                            
+                            bytes_read = f.read(fsize)
+                            self.broadcast(bytes_read, 'Server')
+                            
+                        print("File sent")
                         
-                        bytes_read = f.read(filesize)
-                        self.broadcast(bytes_read, 'Server')
-                        
-                    print("File sent")
+                    except:
+                        print("An error occured!")
 
                 else:
                     self.broadcast(b_message.encode('utf-8'), 'Server')
