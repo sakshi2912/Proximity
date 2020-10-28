@@ -21,10 +21,15 @@ This repository contains a simple implementation of an offline chatroom.
   
     ``` python3 client.py < chatroom's passkey > ```
 
+- To send a file from client to server or vice-versa 
+    ``` file:path_to_file ```
+   This is received and stored in a folder: Proximity_files
+
 ## Features/Bugs:
 
 - Works on Windows, Linux and Mac OS
 - Can support group chats.
+- Can support file transfer between client and server ( The received files will be stored in a folder called **Proimity_files** ).
 - Anyone in the same network can start/join chatroom.
 - A client can exit and re-connect to a chat-room multiple times.
 - A server can host multiple chatrooms, but only one chat-room per network interface.

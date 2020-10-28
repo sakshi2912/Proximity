@@ -6,7 +6,6 @@ import signal
 from sys import platform
 import base64
 
-
 class serverType:
 
     clients_dict = {}
@@ -114,6 +113,18 @@ class serverType:
                     client.close()
                     self.broadcast('\n \t [{}] left! \n'.format(user).encode('utf-8'), client)
                     break
+                elif message.startswith("file:"):
+                    filename, filesize = message[5:].split(";")
+                    # remove absolute path if there is
+                    filename = os.path.basename(filename)
+                    # convert to integer
+                    filesize = int(filesize)
+                    os.mkdir('Proximity_files')
+                    filename = os.path.join('Proximity_files', filename)
+                    with open(filename, "wb") as f:
+                        bytes_read = client.recv(filesize)
+                        f.write(bytes_read)
+                    print(f"File {filename} received ")
                 else:
                     print('\t\t\t\t', message)
                     self.broadcast(message.encode('utf-8'), client)
@@ -125,6 +136,8 @@ class serverType:
                 self.broadcast('\n \t [{}] left! \n'.format(user).encode('utf-8'), client)
                 break
 
+
+
     def send_message(self):
         while True:
             try:
@@ -133,11 +146,24 @@ class serverType:
                 if message == self.DISCONNECT_MESSAGE:
                     self.broadcast('Server left'.encode('utf-8'), 'Server')
                     os._exit(0)
-                self.broadcast(b_message.encode('utf-8'), 'Server')
+                elif message.startswith("file:"):
+                    filename=message[5:]
+                    filesize=os.path.getsize("Proximity_files/Server/"+filename)
+                    message = message+";"+str(filesize)
+                    self.broadcast(message.encode('utf-8'),'Server')
+                    with open(("Proximity_files/Server/"+filename), "rb") as f:
+                        
+                        bytes_read = f.read(filesize)
+                        self.broadcast(bytes_read, 'Server')
+                        
+                    print("File sent")
+                else:
+                    self.broadcast(b_message.encode('utf-8'), 'Server')
             except:
                 print('\n \t Error Occoured while Reading input \n')
                 self.broadcast('Server left'.encode('utf-8'), 'Server')
                 os._exit(0)
+
 
     def accept_conn(self):
         while True:
