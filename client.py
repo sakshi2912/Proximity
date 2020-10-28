@@ -77,7 +77,7 @@ class clientType:
                     filename = os.path.basename(filename)
                     # convert to integer
                     filesize = int(filesize)
-                    with open(filename, "wb") as f:
+                    with open(("Proximity_files/Client/"+filename), "wb") as f:
                         bytes_read = self.client.recv(filesize)
                         f.write(bytes_read)
                 else:
@@ -98,10 +98,10 @@ class clientType:
                     os._exit(0)
                 elif input_val.startswith("file:"):
                     filename=input_val[5:]
-                    filesize=os.path.getsize(filename)
+                    filesize=os.path.getsize("Proximity_files/Client/"+filename)
                     message = input_val+";"+str(filesize)
                     self.client.send(message.encode('utf-8'))
-                    with open(filename, "rb") as f:
+                    with open(("Proximity_files/Client/"+filename), "rb") as f:
                         
                         bytes_read = f.read(filesize)
                         self.client.send(bytes_read)
