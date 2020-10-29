@@ -182,7 +182,7 @@ class serverType:
                     os._exit(0)
                               
                 elif message.startswith('image:'):
-                    fname = message[7:]
+                    fname = message[6:]
                     fsize = os.path.getsize(fname)
                     iname=os.path.basename(fname)
                     message='image: '+iname+' '+str(fsize)
