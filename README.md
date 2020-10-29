@@ -23,13 +23,13 @@ This repository contains a simple implementation of an offline chatroom.
 
 - To send a file from client to server and vice-versa  <br>
 
-    ``` file:path_to_file ``` 
+    ``` file:full_path_to_file ``` 
 
    Files are stored in the folder: Proximity_files
    
 - To send an image from client to server and vice-versa <br>
 
-    ``` image:path_to_image ```<br>
+    ``` image:full_path_to_image ```<br>
 
    Images are stored in the folder: Proximity_images
 
