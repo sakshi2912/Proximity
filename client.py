@@ -74,6 +74,8 @@ class clientType:
                     print(message)
                     self.username = message[25:-1]
 
+                ## Receiving images and files
+
                 elif message.startswith("file:"):
                     fname, fsize = message[5:].split(";")
                     # remove absolute path if there is
@@ -131,8 +133,10 @@ class clientType:
                     print('You will be disconnected')
                     os._exit(0)
 
-                elif input_val.startswith("image: "):
-                    fname = input_val.split()[1]
+                ## Sending images and files
+
+                elif input_val.startswith("image:"):
+                    fname = input_val[6:]
                     fsize = os.path.getsize(fname)
                     iname=os.path.basename(fname)
                     message='image: '+iname+' '+str(fsize)
@@ -170,10 +174,10 @@ class clientType:
                     self.client.send(message.encode('utf-8'))
             except:
                 print('\n \t Error Occoured while Reading input \n')
-                self.client.send(self.DISCONNECT_MESSAGE.encode('utf-8'))
-                self.client.close()
-                print('You will be disconnected')
-                os._exit(0)
+                # self.client.send(self.DISCONNECT_MESSAGE.encode('utf-8'))
+                # self.client.close()
+                # print('You will be disconnected')
+                # os._exit(0)
 
     def keyboardInterruptHandler(self, signal, frame):
         print('Interrupted')

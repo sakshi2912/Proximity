@@ -115,6 +115,8 @@ class serverType:
                     self.broadcast('\n \t [{}] left! \n'.format(user).encode('utf-8'), client)
                     break
 
+                ## Receiving images and files
+
                 elif message.startswith('image:'):
                     fname,fsize = message[7:].split()
                     fpath='Proximity_images'
@@ -180,6 +182,8 @@ class serverType:
                 if message == self.DISCONNECT_MESSAGE:
                     self.broadcast('Server left'.encode('utf-8'), 'Server')
                     os._exit(0)
+
+                ## Sending images and files
                               
                 elif message.startswith('image:'):
                     fname = message[6:]
@@ -228,8 +232,8 @@ class serverType:
                     self.broadcast(b_message.encode('utf-8'), 'Server')
             except:
                 print('\n \t Error Occoured while Reading input \n')
-                self.broadcast('Server left'.encode('utf-8'), 'Server')
-                os._exit(0)
+                # self.broadcast('Server left'.encode('utf-8'), 'Server')
+                # os._exit(0)
 
 
     def accept_conn(self):
