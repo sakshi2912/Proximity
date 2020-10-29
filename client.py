@@ -30,7 +30,7 @@ class clientType:
     def getName(self):
         self.username = input("Enter your username: ")
         while not self.username.isalpha():
-            print(" \n \t ERROR: The username should only contain alphabates. \n")
+            print(" \n \t ERROR: The username should only contain alphabets. \n")
             self.username = input('Enter username : ')
 
     def decode_key(self, valu):
@@ -119,7 +119,7 @@ class clientType:
                     print('\t\t\t\t', message)
 
             except:
-                print("An error occured!")
+                print("An error occurred!")
                 self.client.close()
                 break
 
@@ -173,7 +173,7 @@ class clientType:
                     message = '[{}] : {}'.format(self.username, input_val)
                     self.client.send(message.encode('utf-8'))
             except:
-                print('\n \t Error Occoured while Reading input \n')
+                print('\n \t Error Occurred while Reading input \n')
                 # self.client.send(self.DISCONNECT_MESSAGE.encode('utf-8'))
                 # self.client.close()
                 # print('You will be disconnected')
