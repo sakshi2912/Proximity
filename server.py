@@ -80,7 +80,7 @@ class serverType:
     def getName(self):
         self.server_name = input("\nEnter server name : ")
         while not self.server_name.isalpha():
-            print(" \n \t ERROR: The Server name should only contain a set of alphabates. \n")
+            print(" \n \t ERROR: The Server name should only contain a set of alphabets. \n")
             self.server_name = input('Enter server name : ')
         self.clients_dict['Server'] = self.server_name
 
@@ -141,7 +141,7 @@ class serverType:
                                 f.write(chunk)
                         print('Received Image successfully')
                     except:
-                        print("An error occured!")
+                        print("An error occurred!")
 
                 elif message.startswith("file:"):
                     fname, fsize = message[5:].split(";")
@@ -159,7 +159,7 @@ class serverType:
                         print(f"File {fname} received ")
                     
                     except:
-                        print("An error occured!")
+                        print("An error occurred!")
 
                 else:
                     print('\t\t\t\t', message)
@@ -171,7 +171,6 @@ class serverType:
                 del self.clients_dict[client]
                 self.broadcast('\n \t [{}] left! \n'.format(user).encode('utf-8'), client)
                 break
-
 
 
     def send_message(self):
@@ -208,7 +207,7 @@ class serverType:
                                 self.broadcast(chunks,'Server')
                         print('Sent Image successfully')
                     except:
-                        print("An error occured!")
+                        print("An error occurred!")
 
                 elif message.startswith("file:"):
                     fname=message[5:]
@@ -226,12 +225,12 @@ class serverType:
                         print("File sent")
                         
                     except:
-                        print("An error occured!")
+                        print("An error occurred!")
 
                 else:
                     self.broadcast(b_message.encode('utf-8'), 'Server')
             except:
-                print('\n \t Error Occoured while Reading input \n')
+                print('\n \t Error Occurred while Reading input \n')
                 # self.broadcast('Server left'.encode('utf-8'), 'Server')
                 # os._exit(0)
 
