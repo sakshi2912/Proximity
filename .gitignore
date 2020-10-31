@@ -5,3 +5,4 @@ VMfolder
 Vagrantfile
 Proximity_files
 Proximity_images
+__pycache__

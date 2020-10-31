@@ -41,7 +41,7 @@ class serverType:
                     print("Invalid choice, defaulting to", IPs[0])
                     self.IP = IPs[0]
 
-            print("Server will be running at", self.IP)
+            self.printSysMessage(f"Server will be running at {self.IP}")
 
         elif platform == "darwin":
             os.system("clear")
@@ -59,34 +59,40 @@ class serverType:
                 try:
                     choice = int(choice)
                     if choice < 0 or choice > len(IPs)-1:
-                        print("Invalid choice, defaulting to", IPs[0])
+                        self.printSysMessage(f"Invalid choice, defaulting to {IPs[0]}")
                         self.IP = IPs[0]
                     else:
                         self.IP = IPs[choice]
                 except:
-                    print("Invalid choice, defaulting to", IPs[0])
+                    self.printSysMessage(f"Invalid choice, defaulting to {IPs[0]}")
                     self.IP = IPs[0]
 
-            print("Server will be running at", self.IP)
+            self.printSysMessage(f"Server will be running at {self.IP}")
 
         elif platform == "win32":
             os.system('cls')
             self.IP = socket.gethostbyname(socket.gethostname())
         else:
-            print('Unsupported OS')
+            self.printSysMessage('Unsupported OS')
             exit(1)
         self.mainFunc()
+
+    def printSysMessage(self,s,fillchr=" "):
+        print()
+        print(f"{s}".center(os.get_terminal_size().columns,fillchr))
+        print()
 
     def getName(self):
         self.server_name = input("\nEnter server name : ")
         while not self.server_name.isalpha():
-            print(" \n \t ERROR: The Server name should only contain a set of alphabets. \n")
+            self.printSysMessage("\n ERROR: The Server name should only contain a set of alphabates. \n")
             self.server_name = input('Enter server name : ')
         self.clients_dict['Server'] = self.server_name
 
     def encodefunc(self, val):
         encoded_data = base64.b64encode(bytes(val, 'utf-8'))
-        print("\n\n-------- {}'s Chat-Room accesskey : ( {} ) --------".format(self.server_name, encoded_data.decode('utf-8')))
+        print()
+        self.printSysMessage("{}'s Chat-Room accesskey : ( {} )".format(self.server_name, encoded_data.decode('utf-8')),"-")
 
     def getpasskey(self, str1):
         if str1[0:7] == '192.168':
@@ -101,7 +107,7 @@ class serverType:
             try:
                 client.send(message)
             except:
-                print('\n \t Could not send message \n')
+                self.printSysMessage('Could not send message')
 
     def rec_message(self, client):
         while True:
@@ -139,9 +145,9 @@ class serverType:
                             if fsize-k:
                                 chunk=client.recv(fsize-k+1)
                                 f.write(chunk)
-                        print('Received Image successfully')
+                        self.printSysMessage("Received Image successfully")
                     except:
-                        print("An error occurred!")
+                        self.printSysMessage("An error occured!")
 
                 elif message.startswith("file:"):
                     fname, fsize = message[5:].split(";")
@@ -156,13 +162,13 @@ class serverType:
                         with open(fname1, "wb") as f:
                             bytes_read = client.recv(fsize)
                             f.write(bytes_read)
-                        print(f"File {fname} received ")
+                        self.printSysMessage(f"File {fname} received ")
                     
                     except:
-                        print("An error occurred!")
+                        self.printSysMessage("An error occured!")
 
                 else:
-                    print('\t\t\t\t', message)
+                    print(f"{message}".rjust(os.get_terminal_size().columns))
                     self.broadcast(message.encode('utf-8'), client)
             except:
                 user = self.clients_dict[client]
@@ -205,9 +211,9 @@ class serverType:
                             if fsize-k:
                                 chunks=f.read(fsize-k+1)
                                 self.broadcast(chunks,'Server')
-                        print('Sent Image successfully')
+                        self.printSysMessage('\t Sent Image successfully')
                     except:
-                        print("An error occurred!")
+                        self.printSysMessage("An error occured!")
 
                 elif message.startswith("file:"):
                     fname=message[5:]
@@ -222,15 +228,14 @@ class serverType:
                             bytes_read = f.read(fsize)
                             self.broadcast(bytes_read, 'Server')
                             
-                        print("File sent")
+                        self.printSysMessage("File sent")
                         
                     except:
-                        print("An error occurred!")
-
+                        self.printSysMessage("An error occured!")
                 else:
                     self.broadcast(b_message.encode('utf-8'), 'Server')
             except:
-                print('\n \t Error Occurred while Reading input \n')
+                self.printSysMessage('Error Occoured while Reading input')
                 # self.broadcast('Server left'.encode('utf-8'), 'Server')
                 # os._exit(0)
 
@@ -249,7 +254,7 @@ class serverType:
                 message = ('\n \t Username updated to ['+final_client_name+']').encode('utf-8')
                 client.send(message)
             self.clients_dict[client] = final_client_name
-            print("\n \t [{}] joined the server \n".format(self.clients_dict[client]))
+            self.printSysMessage("[{}] joined the server".format(self.clients_dict[client]))
             self.broadcast("\n \t [{}] joined! \n".format(self.clients_dict[client]).encode('utf-8'), client)
             client.send("Connected to [{}]!".format(self.server_name).encode('utf-8'))
             thread = threading.Thread(target=self.rec_message, args=(client,))
@@ -270,7 +275,7 @@ class serverType:
         signal.signal(signal.SIGINT, self.keyboardInterruptHandler)
         thread2 = threading.Thread(target=self.send_message)
         thread2.start()
-        print("Server created Successfully!\n")
+        self.printSysMessage("Server created Successfully!")
         self.accept_conn()
 
 

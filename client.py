@@ -21,7 +21,7 @@ class clientType:
         elif platform == "win32":
             os.system('cls')
         else:
-            print('Unsupported OS')
+            self.printSysMessage('Unsupported OS')
             exit(1)
         self.passkey = sys.argv[1]
         self.IP = self.decode_key(self.passkey)
@@ -30,7 +30,7 @@ class clientType:
     def getName(self):
         self.username = input("Enter your username: ")
         while not self.username.isalpha():
-            print(" \n \t ERROR: The username should only contain alphabets. \n")
+            self.printSysMessage("ERROR: The username should only contain alphabates.")
             self.username = input('Enter username : ')
 
     def decode_key(self, valu):
@@ -64,14 +64,14 @@ class clientType:
                 if message == 'Connect':
                     self.client.send(self.username.encode('utf-8'))
                 elif message == 'Server left':
-                    print('\nServer has disconnected\n')
+                    self.printSysMessage('Server has disconnected')
                     os._exit(0)
 
                 elif 'Connected to' in message:
-                    print('\n \t ', message, '\n')
+                    self.printSysMessage(message)
 
                 elif 'Username updated to [' in message:
-                    print(message)
+                    self.printSysMessage(message)
                     self.username = message[25:-1]
 
                 ## Receiving images and files
@@ -113,13 +113,13 @@ class clientType:
                             chunk=self.client.recv(fsize-k+1)
                             f.write(chunk) 
                     os.chdir(pwd)
-                    print('Received Image successfully')
+                    self.printSysMessage('Received Image successfully')
 
                 else:
-                    print('\t\t\t\t', message)
+                    print(f"{message}".rjust(os.get_terminal_size().columns))
 
             except:
-                print("An error occurred!")
+                self.printSysMessage("An error occured!")
                 self.client.close()
                 break
 
@@ -130,7 +130,7 @@ class clientType:
                 if input_val == self.DISCONNECT_MESSAGE:
                     self.client.send(self.DISCONNECT_MESSAGE.encode('utf-8'))
                     self.client.close()
-                    print('You will be disconnected')
+                    self.printSysMessage('You will be disconnected')
                     os._exit(0)
 
                 ## Sending images and files
@@ -155,7 +155,7 @@ class clientType:
                         if fsize-k:
                             chunks=f.read(fsize-k+1)
                             self.client.send(chunks)
-                    print('Sent Image successfully')
+                    self.printSysMessage('Sent Image successfully')
 
                 elif input_val.startswith("file:"):
                     fname=input_val[5:]
@@ -168,22 +168,27 @@ class clientType:
                         bytes_read = f.read(fsize)
                         self.client.send(bytes_read)
                         
-                    print("\n \t File sent\n")
+                    self.printSysMessage("File sent")
                 else:   
                     message = '[{}] : {}'.format(self.username, input_val)
                     self.client.send(message.encode('utf-8'))
             except:
-                print('\n \t Error Occurred while Reading input \n')
+                self.printSysMessage('Error Occoured while Reading input')
                 # self.client.send(self.DISCONNECT_MESSAGE.encode('utf-8'))
                 # self.client.close()
                 # print('You will be disconnected')
                 # os._exit(0)
 
+    def printSysMessage(self,s,fillchr=" "):
+        print()
+        print(f"{s}".center(os.get_terminal_size().columns,fillchr))
+        print()
+
     def keyboardInterruptHandler(self, signal, frame):
-        print('Interrupted')
+        self.printSysMessage('Interrupted')
         self.client.send(self.DISCONNECT_MESSAGE.encode('utf-8'))
         self.client.close()
-        print('You will be disconnected')
+        self.printSysMessage('You will be disconnected')
         os._exit(0)
 
     def mainFunc(self):
