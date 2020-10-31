@@ -179,7 +179,6 @@ class serverType:
                 break
 
 
-
     def send_message(self):
         while True:
             try:
@@ -233,7 +232,6 @@ class serverType:
                         
                     except:
                         self.printSysMessage("An error occured!")
-
                 else:
                     self.broadcast(b_message.encode('utf-8'), 'Server')
             except:
